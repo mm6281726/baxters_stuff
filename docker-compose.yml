@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  baxters_stuff:
+    container_name: baxters_stuff
+    build: .
+    depends_on:
+      - sqlite
+    volumes:
+      - sqlite_data:/data/db
+    networks:
+      default:
+        ipv4_address: 192.168.15.7
+
+  sqlite:
+    image: alpine:latest
+    volumes:
+      - ./database:/data
+    command: sh -c "apk --no-cache add sqlite && cp /data/initial-db.sqlite /data/db.sqlite && sqlite3 /data/db.sqlite < /data/init.sql && tail -f /dev/null"
+    container_name: sqlite
+    networks:
+      default:
+        ipv4_address: 192.168.15.100
+
+volumes:
+  sqlite_data:
+
+networks:
+  default:
+    name: baxternet
