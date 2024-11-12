@@ -1,9 +1,9 @@
 import os
 
 from flask import Flask
-from app.auth import auth
-from app.db import database
-from app.home import home
+from app.modules.auth import auth
+from app.modules.db import database
+from app.modules.home import home
 
 def create_app(test_config=None):
     app = Flask(__name__)
