@@ -1,8 +1,8 @@
 import os
 
 from flask import Flask
-from app.db import database
 from app.auth import auth
+from app.db import database
 from app.home import home
 
 def create_app(test_config=None):

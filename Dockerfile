@@ -1,11 +1,11 @@
 FROM python:3.8
 
 # Create a working directory
-RUN mkdir /app
-WORKDIR /app
+RUN mkdir /baxters_stuff
+WORKDIR /baxters_stuff
 
 # Copy the files in the current directory to the working directory
-COPY /app /app
+COPY . /baxters_stuff
 
 # export FLASK env vars
 ENV FLASK_APP=baxters_stuff
