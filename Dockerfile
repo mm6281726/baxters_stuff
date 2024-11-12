@@ -5,7 +5,7 @@ RUN mkdir /app
 WORKDIR /app
 
 # Copy the files in the current directory to the working directory
-COPY . /app
+COPY /app /app
 
 # export FLASK env vars
 ENV FLASK_APP=baxters_stuff
@@ -18,4 +18,4 @@ RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # Run the web service
-CMD ["gunicorn", "inventory:create_app()", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]
+CMD ["gunicorn", "app:create_app()", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]

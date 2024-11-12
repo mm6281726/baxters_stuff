@@ -1,4 +1,0 @@
-CREATE TABLE master_parts (
-  id INTEGER PRIMARY KEY AUTOINCREMENT
-  name TEXT
-);
