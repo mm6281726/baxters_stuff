@@ -4,6 +4,7 @@ services:
   baxters_stuff:
     container_name: baxters_stuff
     build: .
+    image: baxters_stuff:latest
     volumes:
       - data:/data/db
     networks:
