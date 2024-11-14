@@ -5,8 +5,8 @@ RUN mkdir /baxters_stuff
 WORKDIR /baxters_stuff
 
 # Copy the files in the current directory to the working directory
-COPY /app /baxters_stuff
-COPY requirements.txt /baxters_stuff/
+COPY . /baxters_stuff
+# COPY requirements.txt /baxters_stuff/
 
 # export env vars
 ENV PIP_ROOT_USER_ACTION=ignore
@@ -18,4 +18,4 @@ RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # Run the web service
-CMD ["gunicorn", "baxters_stuff.wsgi", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]
+CMD ["gunicorn", "app.wsgi", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]
