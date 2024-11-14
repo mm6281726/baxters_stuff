@@ -7,17 +7,17 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <title>Baxters Stuff - {% block title %}{% endblock title %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  {% load static %}
 </head>
 <body>
-{% include("_navigation.html") %}
+{% include "_navigation.html" %}
 <div class="container">
   <header>
     {% block header %}{% endblock header %}
   </header>
-  {% for message in get_flashed_messages() %}
-    <div class="flash">{{ message }}</div>
-  {% endfor %}
+  {% comment %} {% for message in get_flashed_messages() %} {% endcomment %}
+    {% comment %} <div class="flash">{{ message }}</div> {% endcomment %}
+  {% comment %} {% endfor %} {% endcomment %}
   <main>
     {% block content %}Try another page.{% endblock content %}
   </main>

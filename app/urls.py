@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import include, path
 
 urlpatterns = [
-    path("grocery/", include("app.grocery_items.urls")),
     path('admin/', admin.site.urls),
+    path('auth/', include("django.contrib.auth.urls")),
+
+    path("grocery/", include("app.grocery_items.urls")),
 ]

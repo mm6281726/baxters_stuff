@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h2>{% block title %}Grocery Items{% endblock title %}</h2>
+{% endblock header %}
+
+{% block content %}
+  {% if grocery_items %}
+  <ul>
+  {% for grocery_item in grocery_items %}
+      <li><a href="{% url 'grocery_items:detail' grocery_item.id %}">{{ grocery_item.name }}</a></li>
+  {% endfor %}
+  </ul>
+  {% else %}
+  <p>No items are available.</p>
+  {% endif %}
+{% endblock content %}
