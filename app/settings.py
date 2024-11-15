@@ -39,9 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # toolkits
+    'django_bootstrap5',
 
     # baxter apps
+    'app.auth.apps.AuthConfig',
     'app.grocery_items.apps.GroceryItemsConfig',
+    'app.home.apps.HomeConfig',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +136,5 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_REDIRECT_URL = "/"

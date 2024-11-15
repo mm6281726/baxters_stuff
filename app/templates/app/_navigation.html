@@ -9,7 +9,7 @@
         <li class="nav-item"><span>{{ request.user }}</span>
         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Log Out</a>
       {% else %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'auth.register' %}">Register</a>
+        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a>
         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log In</a>
       {% endif %}
     </ul>
