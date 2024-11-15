@@ -1,17 +1,23 @@
-<nav class="navbar navbar-expand-md navbar-light bg-light">
-  <a class="navbar-brand" href="{% url 'grocery_items:index' %}">Baxter's Stuff</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      {% if request.user %}
-        <li class="nav-item"><span>{{ request.user }}</span>
-        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Log Out</a>
-      {% else %}
-        <li class="nav-item"><a class="nav-link" href="{% url 'register' %}">Register</a>
-        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Log In</a>
-      {% endif %}
-    </ul>
-  </div>
-</nav>
+<div class="container">
+  <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+    <a href="{% url 'home:home' %}" class="d-flex align-items-center mb-2 mb-md-0 text-dark text-decoration-none">
+      <div class="fs-4">Baxter's Stuff</div
+    </a>
+
+    {% if request.user.is_authenticated %}
+      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        <li><a href="{% url 'home:home' %}" class="nav-link px-2 link-dark">Home</a></li>
+        <li><a href="{% url 'home:about' %}" class="nav-link px-2 link-dark">About</a></li>
+        <li><a href="" class="nav-link px-2 link-dark">{{ request.user }}</a>
+      </ul>
+      <div class="col-md-3 text-end">
+        <a href="{% url 'logout' %}" class="btn btn-outline-primary">Log Out</a>
+      </div>
+    {% else %}
+      <div class="col-md-3 text-end">
+        <a href="" class="btn btn-outline-primary">Register</a>
+        <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
+      </div>
+    {% endif %}
+  </header>
+</div>

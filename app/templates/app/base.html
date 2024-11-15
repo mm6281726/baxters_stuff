@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   {% load static %}
 
@@ -15,15 +15,17 @@
   <title>Baxters Stuff - {% block title %}{% endblock title %}</title>
 </head>
 <body>
-  {% include "_navigation.html" %}
-  <div class="container">
-    <header>
-      {% block header %}{% endblock header %}
-    </header>
-    {% bootstrap_messages %}
-    <main>
-      {% block content %}Try another page.{% endblock content %}
-    </main>
+  <main>
+    {% include "_navigation.html" %}
+    <div class="container">
+      <header>
+        {% block header %}{% endblock header %}
+      </header>
+      {% bootstrap_messages %}
+      <main>
+        {% block content %}Try another page.{% endblock content %}
+      </main>
   </div>
+  </main>
 </body>
 </html>
