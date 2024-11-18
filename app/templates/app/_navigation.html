@@ -9,10 +9,12 @@
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
           <li><a href="{% url 'home:home' %}" class="nav-link px-2 link-dark">Home</a></li>
           <li><a href="{% url 'home:about' %}" class="nav-link px-2 link-dark">About</a></li>
-          <li><a href="" class="nav-link px-2 link-dark">{{ request.user }}</a>
         </ul>
-        <div class="col-md-3 text-end">
-          <a href="{% url 'logout' %}" class="btn btn-outline-primary">Log Out</a>
+        <div class="col-md-6 text-end">
+          <a href="" class="nav-link px-2 link-dark pull-right">{{ request.user }}</a>
+        </div>
+        <div class="col-md-1 text-end">
+          <a href="{% url 'auth:logout' %}" class="btn btn-outline-primary">Log Out</a>
         </div>
       {% else %}
         <div class="col-md-3 text-end">
