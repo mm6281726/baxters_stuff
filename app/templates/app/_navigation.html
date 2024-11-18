@@ -1,23 +1,25 @@
-<div class="container">
-  <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-    <a href="{% url 'home:home' %}" class="d-flex align-items-center mb-2 mb-md-0 text-dark text-decoration-none">
-      <div class="fs-4">Baxter's Stuff</div
-    </a>
+<div class="bg-light">
+  <div class="container bg-light">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4">
+      <a href="{% url 'home:home' %}" class="d-flex align-items-center mb-2 mb-md-0 text-dark text-decoration-none">
+        <div class="fs-4">Baxter's Stuff</div
+      </a>
 
-    {% if request.user.is_authenticated %}
-      <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="{% url 'home:home' %}" class="nav-link px-2 link-dark">Home</a></li>
-        <li><a href="{% url 'home:about' %}" class="nav-link px-2 link-dark">About</a></li>
-        <li><a href="" class="nav-link px-2 link-dark">{{ request.user }}</a>
-      </ul>
-      <div class="col-md-3 text-end">
-        <a href="{% url 'logout' %}" class="btn btn-outline-primary">Log Out</a>
-      </div>
-    {% else %}
-      <div class="col-md-3 text-end">
-        <a href="" class="btn btn-outline-primary">Register</a>
-        <a href="{% url 'login' %}" class="btn btn-primary me-2">Login</a>
-      </div>
-    {% endif %}
-  </header>
+      {% if request.user.is_authenticated %}
+        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="{% url 'home:home' %}" class="nav-link px-2 link-dark">Home</a></li>
+          <li><a href="{% url 'home:about' %}" class="nav-link px-2 link-dark">About</a></li>
+          <li><a href="" class="nav-link px-2 link-dark">{{ request.user }}</a>
+        </ul>
+        <div class="col-md-3 text-end">
+          <a href="{% url 'logout' %}" class="btn btn-outline-primary">Log Out</a>
+        </div>
+      {% else %}
+        <div class="col-md-3 text-end">
+          <a href="{% url 'auth:register' %}" class="btn btn-outline-primary">Register</a>
+          <a href="{% url 'auth:login' %}" class="btn btn-primary me-2">Login</a>
+        </div>
+      {% endif %}
+    </header>
+  </div>
 </div>
