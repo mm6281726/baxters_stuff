@@ -18,4 +18,4 @@ RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # Run the web service
-CMD ["gunicorn", "backend.backend.wsgi", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]
+CMD ["gunicorn", "backend.wsgi", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]
