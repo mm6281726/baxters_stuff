@@ -16,13 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-from grocery_list import views
 
-router = routers.DefaultRouter()
-router.register(r'grocerylist', views.GroceryListView, 'grocerylist')
+from grocery_list import urls as grocery_list_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/grocerylist/', include(grocery_list_urls)),
 ]
