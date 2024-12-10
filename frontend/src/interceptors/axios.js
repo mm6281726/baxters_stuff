@@ -17,10 +17,13 @@ axios.interceptors.response.use(resp => resp, async error => {
                     'Content-Type': 'application/json'
                 }
             }, { withCredentials: true });
-            
+
         if (response.status === 200) {
-            axios.defaults.headers.common['Authorization'] = `JWT ${response.data['access']}`;
-            localStorage.setItem('access', response.data.access);
+            const access = response.data.access
+            const access_header = `JWT ${access}`;
+            axios.defaults.headers.common['Authorization'] = access_header;
+            error.config.headers['Authorization'] = access_header;
+            localStorage.setItem('access', access);
             localStorage.setItem('refresh', response.data.refresh);
             return axios(error.config);
         }

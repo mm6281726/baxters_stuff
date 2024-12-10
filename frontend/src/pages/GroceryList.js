@@ -30,7 +30,7 @@ class GroceryList extends Component {
             .get("/api/grocerylist/")
             .then(
                 (res) => this.setState({ groceryList: res.data }),
-                (res) => cookies.set('csrftoken', res.csrftoken)
+                // (res) => cookies.set('csrftoken', res.csrftoken)
             )
             .catch((err) => console.log(err));
     };
@@ -98,7 +98,13 @@ class GroceryList extends Component {
 
     renderItems = () => {
         const { viewCompleted } = this.state;
-        const newItems = this.state.groceryList.filter(
+
+        const groceryList = this.state.groceryList;
+        if(!groceryList){
+            return;
+        }
+
+        const newItems = groceryList.filter(
             (item) => item.completed === viewCompleted
         );
 
