@@ -1,10 +1,7 @@
-import logging
 from typing import Dict
 
 from ..models import GroceryList
 from ..serializers import GroceryListSerializer
-
-logger = logging.getLogger(__name__)
 
 class GroceryListService:
 
@@ -21,15 +18,15 @@ class GroceryListService:
         return serializer.data
     
     @staticmethod
-    def create(**kwargs) -> Dict:
-        grocery_list = GroceryList.objects.create(**kwargs)
+    def create(validated_data) -> Dict:
+        grocery_list = GroceryList.objects.create(**validated_data)
         serializer = GroceryListSerializer(grocery_list)
         return serializer.data
     
     @staticmethod
-    def update(id, **kwargs) -> Dict:
+    def update(id, validated_data) -> Dict:
         grocery_list_filter = GroceryList.objects.filter(id=id)
-        grocery_list_filter.update(**kwargs)
+        grocery_list_filter.update(**validated_data)
         grocery_list = grocery_list_filter.first()
         serializer = GroceryListSerializer(grocery_list)
         return serializer.data
