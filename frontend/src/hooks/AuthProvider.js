@@ -1,5 +1,4 @@
 import { useContext, createContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const AuthContext = createContext();
@@ -8,7 +7,6 @@ const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [accessToken, setAccessToken] = useState(localStorage.getItem("access") || "");
     const [refreshToken, setRefreshToken] = useState(localStorage.getItem("refresh") || "");
-    const navigate = useNavigate();
     
     const loginAction = async (data) => {
         let error;
@@ -42,14 +40,12 @@ const AuthProvider = ({ children }) => {
             setRefreshToken(refresh);
             localStorage.setItem("access", access);
             localStorage.setItem("refresh", refresh);
-            axios.defaults.headers.common['Authorization'] = `Bearer ${access}`;
         }else{
             setUser(null);
             setAccessToken("");
             setRefreshToken("");
             localStorage.removeItem("access");
             localStorage.removeItem("refresh");
-            axios.defaults.headers.common['Authorization'] = null;
         }
     }
 

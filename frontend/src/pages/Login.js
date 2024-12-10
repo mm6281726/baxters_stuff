@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Form, FormGroup, Input, Label } from 'reactstrap';
+import { Button, Col, Form, FormGroup, Input, Label, Row } from 'reactstrap';
 
 import { useAuth } from "../hooks/AuthProvider";
 
@@ -29,30 +29,41 @@ export const Login = () => {
 
     return (
         <div className="container">
-            <h3>Sign In</h3>
-            <Form onSubmit={handleSubmitEvent}>
-                <FormGroup floating>
-                    <Input 
-                        name='username'
-                        placeholder="Username"
-                        type='text'
-                        required
-                        onChange={handleInput} />
-                    <Label for="username">Username</Label>
-                </FormGroup>
-                <FormGroup floating>
-                    <Input 
-                        name='password'
-                        type="password"
-                        placeholder="Password"
-                        required
-                        onChange={handleInput} />
-                    <Label for="password">Password</Label>
-                </FormGroup>
-                <Button color="primary">
-                    Submit
-                </Button>
-            </Form>
+            <Row>
+                <Col
+                    md={{
+                        offset: 3,
+                        size: 5
+                    }}
+                >
+                    <h3>Sign In</h3>
+                    <Form onSubmit={handleSubmitEvent} className="mt-3">
+                        <FormGroup floating>
+                            <Input 
+                                name='username'
+                                placeholder="Username"
+                                type='text'
+                                required
+                                onChange={handleInput}
+                                />
+                            <Label for="username">Username</Label>
+                        </FormGroup>
+                        <FormGroup floating>
+                            <Input 
+                                name='password'
+                                type="password"
+                                placeholder="Password"
+                                required
+                                onChange={handleInput}
+                                />
+                            <Label for="password">Password</Label>
+                        </FormGroup>
+                        <Button color="primary">
+                            Submit
+                        </Button>
+                    </Form>
+                </Col>
+            </Row>
         </div>
     )
 }

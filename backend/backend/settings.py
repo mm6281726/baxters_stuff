@@ -63,6 +63,9 @@ MIDDLEWARE = [
 
     #toolkits
     'corsheaders.middleware.CorsMiddleware',
+
+    #baxter middleware
+    'accounts.middleware.jwt.JwtMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -120,31 +123,25 @@ AUTH_USER_MODEL="accounts.User"
 
 # REST Framework configurations
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated', # make all endpoints private
     ],
 }
 
 SIMPLE_JWT = {
-     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
+     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=1),
      'REFRESH_TOKEN_LIFETIME': timedelta(weeks=520),
      'ROTATE_REFRESH_TOKENS': True,
-     'BLACKLIST_AFTER_ROTATION': True
+     'BLACKLIST_AFTER_ROTATION': True,
 }
 
 CORS_ORIGIN_WHITELIST = [
-     'http://localhost:3000'
+     'http://localhost:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:3000'
+    'http://localhost:3000',
 ]
 
 # Internationalization
