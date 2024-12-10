@@ -13,3 +13,5 @@ build/
 *.swp
 
 .vscode/
+
+node_modules/
