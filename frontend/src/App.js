@@ -7,8 +7,6 @@ import { Register } from "./pages/Register";
 import GroceryList from "./pages/GroceryList";
 import AuthProvider from "./hooks/AuthProvider";
 
-import axios from "axios";
-
 class App extends Component {
   constructor(props) {
     super(props);
