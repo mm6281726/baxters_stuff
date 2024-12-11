@@ -2,9 +2,6 @@ import React, { Component } from "react";
 import Modal from "../components/Modal"
 
 import axios from "axios";
-import Cookies from 'universal-cookie';
-
-const cookies = new Cookies();
 
 class GroceryList extends Component {
     constructor(props) {
@@ -30,7 +27,6 @@ class GroceryList extends Component {
             .get("/api/grocerylist/")
             .then(
                 (res) => this.setState({ groceryList: res.data }),
-                // (res) => cookies.set('csrftoken', res.csrftoken)
             )
             .catch((err) => console.log(err));
     };

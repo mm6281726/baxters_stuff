@@ -1,5 +1,8 @@
 import axios from "axios";
 
+import Cookies from 'universal-cookie';
+const cookies = new Cookies();
+
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.xsrfCookieName = 'csrftoken'
 
@@ -25,6 +28,17 @@ axios.interceptors.response.use(resp => resp, async error => {
             error.config.headers['Authorization'] = access_header;
             localStorage.setItem('access', access);
             localStorage.setItem('refresh', response.data.refresh);
+            return axios(error.config);
+        }
+    }else if(error.response.status === 403 && !refresh){
+        refresh = true;
+        const response = await
+            axios.get('/api/accounts/login/');
+
+        if (response.status === 200) {
+            const csrftoken = response.csrftoken;
+            cookies.set('csrftoken', csrftoken);
+            error.config.headers['X-CSRFToken'] = csrftoken;
             return axios(error.config);
         }
     }

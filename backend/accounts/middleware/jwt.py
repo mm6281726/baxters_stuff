@@ -5,7 +5,7 @@ from ..services import LoginService
 
 def JwtMiddleware(get_response):
     PREFIX = 'JWT '
-    allowPaths = ('/api/accounts/login/',)
+    allowPaths = ('/api/accounts/',)
 
     def middleware(request):
         path = request.path
