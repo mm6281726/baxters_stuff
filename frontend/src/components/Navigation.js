@@ -15,15 +15,13 @@ export function Navigation() {
     
     return (
         <div>
-            <Navbar color="light" light className="mb-4">
+            <Navbar color="light" light expand="md" className="mb-4">
                 <NavbarBrand href="/">Baxter's Stuff</NavbarBrand>            
                 <Nav navbar> 
                     {isAuth ? <NavLink href="/">Grocery List</NavLink> : null}
                 </Nav>
-                <Nav navbar className="mr-1">
-                    <NavItem>
-                        {isAuth ? null : <NavLink href="/register">Register</NavLink>}
-                    </NavItem>
+                <Nav navbar className="ml-auto">
+                    {isAuth ? null : <NavItem><NavLink href="/register">Register</NavLink></NavItem>}                    
                     <NavItem>
                         {isAuth ? <NavLink href="#" onClick={() =>auth.logOut()}>Logout</NavLink> : 
                               <NavLink href="/login">Login</NavLink> }

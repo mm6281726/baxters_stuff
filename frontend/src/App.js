@@ -3,13 +3,11 @@ import { BrowserRouter, Routes, Route } from 'react-router'
 import PrivateRoute from "./components/PrivateRoute";
 import { Navigation } from './components/Navigation';
 import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
 import GroceryList from "./pages/GroceryList";
 import AuthProvider from "./hooks/AuthProvider";
 
 import axios from "axios";
-
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-axios.defaults.xsrfCookieName = 'csrftoken'
 
 class App extends Component {
   constructor(props) {
@@ -25,6 +23,7 @@ class App extends Component {
             <Navigation></Navigation>
             <Routes>
               <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
               <Route element={<PrivateRoute />}>
                 <Route path="/" element={<GroceryList />} />
               </Route>

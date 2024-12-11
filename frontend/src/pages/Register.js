@@ -1,19 +1,35 @@
-import { useState } from "react";
+import { useState } from 'react';
 import { Button, Col, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+
+import axios from 'axios';
 
 import { useAuth } from "../hooks/AuthProvider";
 
-export const Login = () => {
+export const Register = () => {
+    const auth = useAuth();
     const [input, setInput] = useState({
+        email: "",
         username: "",
         password: "",
+        password1: "",
+        password2: "",
     });
 
-    const auth = useAuth();
     const handleSubmitEvent = (e) => {
         e.preventDefault();
-        if (input.username !== "" && input.password !== "") {
-            auth.loginAction(input);
+        if (input.username !== "" && input.password1 !== "" 
+            && input.password2 !== "") {
+            axios
+                .post("/api/accounts/", JSON.stringify(input))
+                .then((res) => {
+                    if(res.data.user){
+                        input.password = input.password1
+                        auth.loginAction(input);
+                    }
+                })
+                .catch((err)=>{
+                    alert("Username already exists.");
+                });
             return;
         }
         alert("Please provide valid input.");
@@ -36,8 +52,17 @@ export const Login = () => {
                         size: 5
                     }}
                 >
-                    <h3>Login</h3>
+                    <h3>Register</h3>
                     <Form onSubmit={handleSubmitEvent} className="mt-3">
+                        <FormGroup floating>
+                            <Input 
+                                name='email'
+                                placeholder="Email"
+                                type='email'
+                                onChange={handleInput}
+                                />
+                            <Label for="email">Email</Label>
+                        </FormGroup>
                         <FormGroup floating>
                             <Input 
                                 name='username'
@@ -50,16 +75,26 @@ export const Login = () => {
                         </FormGroup>
                         <FormGroup floating>
                             <Input 
-                                name='password'
+                                name='password1'
                                 type="password"
                                 placeholder="Password"
                                 required
                                 onChange={handleInput}
                                 />
-                            <Label for="password">Password</Label>
+                            <Label for="password1">Password</Label>
+                        </FormGroup>
+                        <FormGroup floating>
+                            <Input 
+                                name='password2'
+                                type="password"
+                                placeholder="Confirm Password"
+                                required
+                                onChange={handleInput}
+                                />
+                            <Label for="password2">Confirm Password</Label>
                         </FormGroup>
                         <Button color="primary">
-                            Submit
+                            Register
                         </Button>
                     </Form>
                 </Col>

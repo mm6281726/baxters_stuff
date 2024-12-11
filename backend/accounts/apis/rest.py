@@ -16,7 +16,8 @@ class UserAPI:
             return JsonResponse(UserService.list(), safe=False)
         elif request.method == 'POST':
             logger.info('user method "create" called')
-            return JsonResponse(UserService.create(validated_data=request.data))
+            data=json.loads(request.body.decode("utf-8"))
+            return JsonResponse(UserService.create(validated_data=data))
 
     @staticmethod  
     def detail(request):
@@ -32,8 +33,8 @@ class LoginAPI():
             csrftoken = request.COOKIES.get('csrftoken')
             return JsonResponse({"csrftoken": csrftoken})
         elif request.method == 'POST':
-            data=json.loads(request.body.decode("utf-8"))
             logger.info('login method "create" called')
+            data=json.loads(request.body.decode("utf-8"))
             return JsonResponse(LoginService.login(validated_data=data))
 
     @staticmethod    
