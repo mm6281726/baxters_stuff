@@ -21,17 +21,24 @@ class GroceryListServiceTests(TestCase):
         Test get() function returns JSON formatted GroceryList
         """
         id = 1
+        title = "Test Title"
         grocery_list = GroceryListService.get(id=id)
         self.assertEqual(grocery_list['id'], id)
-        self.assertEqual(grocery_list['title'], "Test Title")
+        self.assertEqual(grocery_list['title'], title)
 
     def test_create(self):
         """
         Test create() function returns a new JSON formatted GroceryList
         """
-        grocery_list = GroceryListService.create(title="Test Title 2", description="Test Description")
+        title = 'Test Title 2'
+        description = 'Test Description'
+        validated_data = {}
+        validated_data['title'] = title
+        validated_data['description'] = description
+        grocery_list = GroceryListService.create(validated_data)
         self.assertEqual(grocery_list['id'], 3)
-        self.assertEqual(grocery_list['title'], "Test Title 2")
+        self.assertEqual(grocery_list['title'], title)
+        self.assertEqual(grocery_list['description'], description)
 
     def test_update(self):
         """
@@ -40,7 +47,10 @@ class GroceryListServiceTests(TestCase):
         id = 1
         title = "Updated Title"
         description = "Updated Description"
-        grocery_list = GroceryListService.update(id=id, title=title, description=description)
+        validated_data = {}
+        validated_data['title'] = title
+        validated_data['description'] = description
+        grocery_list = GroceryListService.update(id, validated_data)
         self.assertEqual(grocery_list['id'], id)
         self.assertEqual(grocery_list['title'], title)
         self.assertEqual(grocery_list['description'], description)
