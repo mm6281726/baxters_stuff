@@ -25,7 +25,7 @@ class UserService:
                 email=email,
             )
         except Exception as e:
-            raise serializers.ValidationError('Username already exists.') 
+            raise serializers.ValidationError('Username is invalid or already exists.') 
 
         user.set_password(password1)
         user.save()

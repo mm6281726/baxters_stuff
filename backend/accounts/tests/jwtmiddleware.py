@@ -1,7 +1,7 @@
-from rest_framework.test import APIClient, APITestCase
+from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from ..models import User
 
 class JwtMiddlewareTests(APITestCase):
     def setUp(self):

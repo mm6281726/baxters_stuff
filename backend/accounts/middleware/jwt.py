@@ -20,13 +20,10 @@ class JwtMiddleware:
         except exceptions.AuthenticationFailed as exception:
             return JsonResponse({ 'message': exception.detail, }, status=exception.status_code)
         
-
-    @staticmethod
     def __allow_request(request):
         path = request.path
         return path.startswith(JwtMiddleware.allowPaths)
     
-    @staticmethod
     def __create_response(self, request):
         user = JwtMiddleware.__authenticate(request)
         if user:
@@ -36,7 +33,6 @@ class JwtMiddleware:
         
         return self.get_response(request)
 
-    @staticmethod
     def __authenticate(request):
         access = JwtMiddleware.__get_token(request)
         try:
@@ -46,7 +42,6 @@ class JwtMiddleware:
         
         return user
 
-    @staticmethod
     def __get_token(request):
         header = JwtMiddleware.__get_header(request)
         token = header[len(JwtMiddleware.PREFIX):]
@@ -55,7 +50,6 @@ class JwtMiddleware:
         
         return token
     
-    @staticmethod
     def __get_header(request):
         header = request.META.get('HTTP_AUTHORIZATION')
         if not header or not header.startswith(JwtMiddleware.PREFIX):
