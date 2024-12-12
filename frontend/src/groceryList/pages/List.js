@@ -1,9 +1,12 @@
 import React, { Component } from "react";
-import Modal from "../components/Modal"
+import { Button, Card, ListGroup, ListGroupItem, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
+import classnames from 'classnames';
+
+import Modal from "../components/ListModal"
 
 import axios from "axios";
 
-class GroceryList extends Component {
+class GroceryLists extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -75,20 +78,24 @@ class GroceryList extends Component {
 
     renderTabList = () => {
         return (
-            <div className="nav nav-tabs">
-                <span
-                    className={this.state.viewCompleted ? "nav-link active" : "nav-link"}
-                    onClick={() => this.displayCompleted(true)}
-                >
-                    Complete
-                </span>
-                <span
-                    className={this.state.viewCompleted ? "nav-link" : "nav-link active"}
-                    onClick={() => this.displayCompleted(false)}
-                >
-                    Incomplete
-                </span>
-            </div>
+            <Nav tabs>
+                <NavItem>
+                    <NavLink 
+                        className={classnames({ active: this.state.viewCompleted})}
+                        onClick={() => this.displayCompleted(true)}
+                    >
+                        Complete
+                    </NavLink>
+                </NavItem>
+                <NavItem>
+                    <NavLink 
+                        className={classnames({ active: !this.state.viewCompleted})}
+                        onClick={() => this.displayCompleted(false)}
+                    >
+                        Incomplete
+                    </NavLink>
+                </NavItem>
+            </Nav>
         );
     };
 
@@ -105,57 +112,64 @@ class GroceryList extends Component {
         );
 
         return newItems.map((item) => (
-            <li
+            <ListGroupItem
                 key={item.id}
-                className="list-group-item d-flex justify-content-between align-items-center"
+                className="d-flex justify-content-between align-items-center"
             >
                 <span
-                    className={`grocerylist-title mr-2 ${this.state.viewCompleted ? "completed-grocerylist" : ""
-                        }`}
+                    className={`
+                        grocerylist-title  
+                        ${this.state.viewCompleted ? "completed-grocerylist" : ""}
+                    `}
                     title={item.description}
                 >
                     {item.title}
                 </span>
                 <span>
-                    <button
-                        className="btn btn-secondary mr-2"
+                    <Button 
+                        color="secondary"
                         onClick={() => this.editItem(item)}
                     >
                         Edit
-                    </button>
-                    <button
-                        className="btn btn-danger"
+                    </Button>
+                    {" "}
+                    <Button
+                        color="danger"
                         onClick={() => this.handleDelete(item)}
                     >
                         Delete
-                    </button>
+                    </Button>
                 </span>
-            </li>
+            </ListGroupItem>
         ));
     };
 
     render(){
         return (
             <div>
-                <h1 className="text-uppercase text-center my-4">Grocery List</h1>
-                <div className="row">
-                    <div className="col-md-6 col-sm-10 mx-auto p-0">
-                        <div className="card p-3">
+                <h1 className="text-uppercase text-center my-4">Grocery Lists</h1>
+                <Row>
+                    <Col
+                        md="6"
+                        sm="10"
+                        className="mx-auto p-0"
+                    >
+                        <Card className="p-3">
                             <div className="mb-4">
-                                <button
-                                    className="btn btn-primary"
+                                <Button
+                                    color="primary"
                                     onClick={this.createItem}
                                 >
                                     Add List
-                                </button>
+                                </Button>
                             </div>
                             {this.renderTabList()}
-                            <ul className="list-group list-group-flush border-top-0">
+                            <ListGroup flush className="border-top-0">
                                 {this.renderItems()}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                            </ListGroup>
+                        </Card>
+                    </Col>
+                </Row>
     
                 {this.state.modal ? (
                     <Modal
@@ -169,4 +183,4 @@ class GroceryList extends Component {
     }
 }
 
-export default GroceryList
+export default GroceryLists

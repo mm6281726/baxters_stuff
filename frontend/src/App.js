@@ -1,11 +1,14 @@
 import React, { Component } from "react";
 import { BrowserRouter, Routes, Route } from 'react-router'
-import PrivateRoute from "./components/PrivateRoute";
-import { Navigation } from './components/Navigation';
-import { Login } from "./pages/Login";
-import { Register } from "./pages/Register";
-import GroceryList from "./pages/GroceryList";
-import AuthProvider from "./hooks/AuthProvider";
+
+import AuthProvider from "./auth/hooks/AuthProvider";
+import PrivateRoute from "./auth/components/PrivateRoute";
+import { Navigation } from './auth/components/Navigation';
+import { Login } from "./auth/pages/Login";
+import { Register } from "./auth/pages/Register";
+
+import GroceryLists from "./groceryList/pages/List";
+import Ingredients from "./ingredients/pages/List";
 
 class App extends Component {
   constructor(props) {
@@ -23,7 +26,10 @@ class App extends Component {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route element={<PrivateRoute />}>
-                <Route path="/" element={<GroceryList />} />
+                <Route path="/" element={<GroceryLists />} />
+              </Route>
+              <Route element={<PrivateRoute />}>
+                <Route path="/ingredients" element={<Ingredients />} />
               </Route>
             </Routes>
             </AuthProvider>
