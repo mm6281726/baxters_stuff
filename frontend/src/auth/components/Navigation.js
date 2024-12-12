@@ -19,6 +19,7 @@ export function Navigation() {
                 <NavbarBrand href="/">Baxter's Stuff</NavbarBrand>            
                 <Nav navbar> 
                     {isAuth ? <NavLink href="/">Grocery List</NavLink> : null}
+                    {isAuth ? <NavLink href="/ingredients">Ingredients</NavLink> : null}
                 </Nav>
                 <Nav navbar className="ml-auto">
                     {isAuth ? null : <NavItem><NavLink href="/register">Register</NavLink></NavItem>}                    

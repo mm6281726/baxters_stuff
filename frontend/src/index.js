@@ -5,7 +5,7 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-import './interceptors/axios';
+import './auth/interceptors/axios';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
