@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
-from ..models import Ingredient, IngredientCategory
-
+from ..models import Ingredient
 from .category import IngredientCategorySerializer
 
 class IngredientSerializer(serializers.ModelSerializer):
@@ -19,8 +18,9 @@ class IngredientSerializer(serializers.ModelSerializer):
         return ingredient
     
     def update(self, instance, validated_data):
-        instance.name = validated_data.get('name')
-        instance.description = validated_data.get('description')
+        validated_data.pop('categories', None)
+        for k, v in validated_data.items():
+            setattr(instance, k, v)
         IngredientSerializer.__update_categories(self, instance)
         instance.save()
         return instance

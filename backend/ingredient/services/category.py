@@ -22,16 +22,17 @@ class IngredientCategoryService:
     
     @staticmethod
     def create(validated_data) -> Dict:
-        ingredientCategory = IngredientCategory.objects.create(**validated_data)
-        serializer = IngredientCategorySerializer(ingredientCategory)
+        serializer = IngredientCategorySerializer(data=validated_data)
+        if serializer.is_valid():
+            serializer.save()
         return serializer.data
     
     @staticmethod
     def update(id, validated_data) -> Dict:
-        ingredientCategory_filter = IngredientCategory.objects.filter(id=id)
-        ingredientCategory_filter.update(**validated_data)
-        ingredientCategory = ingredientCategory_filter.first()
-        serializer = IngredientCategorySerializer(ingredientCategory)
+        category = IngredientCategoryService.__get(id=id)
+        serializer = IngredientCategorySerializer(instance=category, data=validated_data)
+        if serializer.is_valid():
+            serializer.save()
         return serializer.data
     
     @staticmethod
