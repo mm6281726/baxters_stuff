@@ -9,17 +9,8 @@ export default class CategorySelect extends Component {
         super(props);
         this.state = {
             categories: [],
-            selected_categories: this.props.selected_categories,
-            onLoad: true,
+            selected_categories: [],
         };
-    }
-
-    createPreselectedValues = (categories) => {
-        let selected_categories = categories.filter( (category) =>
-            this.state.selected_categories.includes(category.value)
-        )
-
-        this.setState({ selected_categories: selected_categories })
     }
 
     componentDidMount() {
@@ -32,10 +23,7 @@ export default class CategorySelect extends Component {
             .then((res) => {
                 let categories = this.createOptions(res.data)
                 this.setState({ categories: categories})
-                if(this.state.onLoad){
-                    // this.createPreselectedValues(categories);
-                    this.setState({ onLoad: false });
-                }
+                this.createPreselectedValues();
             })
             .catch((err) => console.log(err));
     };
@@ -45,6 +33,11 @@ export default class CategorySelect extends Component {
             return
         }
         return categories.map(category => ({ label: category.name, value: category.id }));
+    }
+
+    createPreselectedValues = () => {
+        let selected_categories = this.createOptions(this.props.selected_categories)
+        this.setState({ selected_categories: selected_categories })
     }
 
     createCategory = (category) => {
