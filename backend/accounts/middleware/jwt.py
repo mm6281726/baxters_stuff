@@ -28,7 +28,7 @@ class JwtMiddleware:
         user = JwtMiddleware.__authenticate(request)
         if user:
             request.user = user
-        else:
+        else
             raise exceptions.AuthenticationFailed("Could not verify token.")
         
         return self.get_response(request)
