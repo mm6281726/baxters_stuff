@@ -9,6 +9,9 @@ class IngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ingredient
         fields = '__all__'
+        extra_kwargs = {
+            "description": {"required": False, "allow_blank": True, "allow_null": True}
+        }
 
     def create(self, validated_data):
         validated_data.pop('categories', None)

@@ -38,6 +38,7 @@ class Ingredients extends Component {
         this.toggle();
 
         if (item.id) {
+            console.log(item)
             axios
                 .put(`/api/ingredients/${item.id}/`, item)
                 .then((res) => this.refreshList());

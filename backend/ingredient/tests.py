@@ -45,6 +45,22 @@ class IngredientServiceTests(TestCase):
         self.assertEqual(ingredient['description'], description)
         self.assertEqual(len(ingredient['categories']), 0)
 
+    def test_create_no_description(self):
+        """
+        Test create() function returns a new JSON formatted Ingredient
+        """
+        name = 'Test Name 2'
+        description = ''
+        validated_data = {}
+        validated_data['name'] = name
+        validated_data['description'] = description
+        validated_data['categories'] = []
+        ingredient = IngredientService.create(validated_data)
+        self.assertEqual(ingredient['id'], 3)
+        self.assertEqual(ingredient['name'], name)
+        self.assertEqual(ingredient['description'], description)
+        self.assertEqual(len(ingredient['categories']), 0)
+
     def test_update(self):
         """
         Test update() function returns an updated JSON formatted Ingredient
@@ -52,6 +68,23 @@ class IngredientServiceTests(TestCase):
         id = 1
         name = "Updated Name"
         description = "Updated Description"
+        validated_data = {}
+        validated_data['name'] = name
+        validated_data['description'] = description
+        validated_data['categories'] = []
+        ingredient = IngredientService.update(id, validated_data)
+        self.assertEqual(ingredient['id'], id)
+        self.assertEqual(ingredient['name'], name)
+        self.assertEqual(ingredient['description'], description)
+        self.assertEqual(len(ingredient['categories']), 0)
+
+    def test_update_no_description(self):
+        """
+        Test update() function returns an updated JSON formatted Ingredient
+        """
+        id = 1
+        name = "Updated Name"
+        description = ""
         validated_data = {}
         validated_data['name'] = name
         validated_data['description'] = description

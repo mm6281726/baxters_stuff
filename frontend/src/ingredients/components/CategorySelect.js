@@ -15,6 +15,7 @@ export default class CategorySelect extends Component {
 
     componentDidMount() {
         this.refreshList();
+        this.createPreselectedValues();
     }
 
     refreshList = () => {
@@ -23,10 +24,14 @@ export default class CategorySelect extends Component {
             .then((res) => {
                 let categories = this.createOptions(res.data)
                 this.setState({ categories: categories})
-                this.createPreselectedValues();
             })
             .catch((err) => console.log(err));
     };
+    
+    createPreselectedValues = () => {
+        let selected_categories = this.createOptions(this.props.selected_categories)
+        this.setState({ selected_categories: selected_categories })
+    }
 
     createOptions = (categories) => {
         if(categories === undefined){
@@ -35,25 +40,15 @@ export default class CategorySelect extends Component {
         return categories.map(category => ({ label: category.name, value: category.id }));
     }
 
-    createPreselectedValues = () => {
-        let selected_categories = this.createOptions(this.props.selected_categories)
-        this.setState({ selected_categories: selected_categories })
-    }
-
     createCategory = (category) => {
         axios
             .post("/api/ingredients/categories/", {'name': category})
-            .then((res) => {
-                let data = res.data;
-                this.refreshList();
-
-                let category = { label: data.name, value: data.id };
-                this.selectNewCategory(category)
-            })
+            .then((res) => { this.selectNewCategory(res) })
             .catch((err) => console.log(err));
     };
 
-    selectNewCategory = (category) => {
+    selectNewCategory = (res) => {
+        let category = { label: res.data.name, value: res.data.id };
         this.setState({ selected_categories: [...this.state.selected_categories, category] });
     }
 
