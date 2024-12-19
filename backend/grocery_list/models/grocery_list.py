@@ -5,5 +5,5 @@ class GroceryList(models.Model):
     description = models.TextField(null=True)
     completed = models.BooleanField(default=False)
 
-    def _str_(self):
+    def __str__(self):
         return self.title

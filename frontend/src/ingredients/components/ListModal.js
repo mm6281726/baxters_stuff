@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import CategorySelect from "./CategorySelect";
 import {
   Button,
   Modal,
@@ -17,12 +18,21 @@ export default class CustomModal extends Component {
     this.state = {
       activeItem: this.props.activeItem,
     };
+    this.handleCategoriesChange = this.handleCategoriesChange.bind(this);
   }
 
   handleChange = (e) => {
     let { name, value } = e.target;
 
     const activeItem = { ...this.state.activeItem, [name]: value };
+
+    this.setState({ activeItem });
+  };
+
+  handleCategoriesChange = (categories) => {
+    let categoryIds = categories.map(category => (category.value));
+
+    const activeItem = { ...this.state.activeItem, ['categories']: categoryIds };
 
     this.setState({ activeItem });
   };
@@ -55,6 +65,12 @@ export default class CustomModal extends Component {
                 value={this.state.activeItem.description}
                 onChange={this.handleChange}
                 placeholder="Enter Ingredient Description"
+              />
+            </FormGroup>
+            <FormGroup>
+              <CategorySelect 
+                selected_categories={this.state.activeItem.categories}
+                updateParentState={this.handleCategoriesChange.bind(this)}
               />
             </FormGroup>
           </Form>

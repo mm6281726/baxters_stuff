@@ -14,6 +14,7 @@ class Ingredients extends Component {
             activeItem: {
                 name: "",
                 description: "",
+                categories: [],
             },
         };
     }
@@ -25,9 +26,7 @@ class Ingredients extends Component {
     refreshList = () => {
         axios
             .get("/api/ingredients/")
-            .then(
-                (res) => this.setState({ ingredients: res.data }),
-            )
+            .then((res) => this.setState({ ingredients: res.data }))
             .catch((err) => console.log(err));
     };
 
@@ -56,7 +55,7 @@ class Ingredients extends Component {
     };
 
     createItem = () => {
-        const item = { name: "", description: "" };
+        const item = { name: "", description: "", categories: [] };
 
         this.setState({ activeItem: item, modal: !this.state.modal });
     };
@@ -80,7 +79,7 @@ class Ingredients extends Component {
                     className="ingredients-title"
                     title={item.description}
                 >
-                    {item.title}
+                    {item.name}
                 </span>
                 <span>
                     <Button 

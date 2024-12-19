@@ -4,4 +4,4 @@ from ..models import GroceryList
 class GroceryListSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroceryList
-        fields = ('id', 'title', 'description', 'completed',)
+        fields = '__all__'

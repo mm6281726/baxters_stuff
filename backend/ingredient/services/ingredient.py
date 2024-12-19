@@ -2,6 +2,7 @@ from typing import Dict
 
 from ..models import Ingredient
 from ..serializers import IngredientSerializer
+from .category import IngredientCategoryService
 
 class IngredientService:
 
@@ -19,16 +20,19 @@ class IngredientService:
     
     @staticmethod
     def create(validated_data) -> Dict:
-        ingredient = Ingredient.objects.create(**validated_data)
-        serializer = IngredientSerializer(ingredient)
+        validated_data['categories'] = IngredientService.__process_categoryids(validated_data)
+        serializer = IngredientSerializer(data=validated_data)
+        if serializer.is_valid():
+            serializer.save()
         return serializer.data
     
     @staticmethod
     def update(id, validated_data) -> Dict:
-        ingredient_filter = Ingredient.objects.filter(id=id)
-        ingredient_filter.update(**validated_data)
-        ingredient = ingredient_filter.first()
-        serializer = IngredientSerializer(ingredient)
+        ingredient = IngredientService.__get(id=id)
+        validated_data['categories'] = IngredientService.__process_categoryids(validated_data)
+        serializer = IngredientSerializer(instance=ingredient, data=validated_data)
+        if serializer.is_valid():
+            serializer.save()
         return serializer.data
     
     @staticmethod
@@ -40,3 +44,7 @@ class IngredientService:
     @staticmethod
     def __get(id=id):
         return Ingredient.objects.filter(id=id).first()
+    
+    @staticmethod
+    def __process_categoryids(validated_data):
+        return IngredientCategoryService.list(validated_data['categories'])
