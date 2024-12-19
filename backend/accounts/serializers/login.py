@@ -32,6 +32,8 @@ class LoginSerializer(serializers.Serializer):
     
     
 class LoginRefreshSerializer(serializers.Serializer):
+    refresh = serializers.CharField(max_length=512)
+
     def validate(self, validated_data):
         refresh = RefreshToken(validated_data.get('refresh'))
         access = refresh.access_token
