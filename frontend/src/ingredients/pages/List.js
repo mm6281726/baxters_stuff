@@ -34,10 +34,12 @@ class Ingredients extends Component {
         this.setState({ modal: !this.state.modal });
     };
 
-    handleSubmit = (item) => {
+    handleSubmit = (item, categoryIds) => {
         this.toggle();
 
         if (item.id) {
+            console.log(item)
+            item.categories = categoryIds
             console.log(item)
             axios
                 .put(`/api/ingredients/${item.id}/`, item)

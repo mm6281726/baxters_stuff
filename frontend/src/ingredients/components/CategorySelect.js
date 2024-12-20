@@ -49,7 +49,9 @@ export default class CategorySelect extends Component {
 
     selectNewCategory = (res) => {
         let category = { label: res.data.name, value: res.data.id };
-        this.setState({ selected_categories: [...this.state.selected_categories, category] });
+        let selected_categories = [...this.state.selected_categories, category]
+        this.setState({ selected_categories: selected_categories });
+        this.props.updateParentState(selected_categories);
     }
 
 
