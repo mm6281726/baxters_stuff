@@ -13,6 +13,7 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.2",
     "react-scripts": "5.0.1",
+    "react-select": "^5.9.0",
     "reactstrap": "^9.2.3",
     "universal-cookie": "^7.2.2",
     "web-vitals": "^4.2.4"

@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import CategorySelect from "./CategorySelect";
 import {
   Button,
   Modal,
@@ -16,7 +17,18 @@ export default class CustomModal extends Component {
     super(props);
     this.state = {
       activeItem: this.props.activeItem,
+      categoryIds: []
     };
+    this.handleCategoriesChange = this.handleCategoriesChange.bind(this);
+  }
+
+  componentDidMount = () => {
+    this.createCategoryIds();
+  }
+
+  createCategoryIds = () => {
+    let categoryIds = this.state.activeItem.categories.map(category => (category.id));
+    this.setState({ categoryIds });
   }
 
   handleChange = (e) => {
@@ -25,6 +37,14 @@ export default class CustomModal extends Component {
     const activeItem = { ...this.state.activeItem, [name]: value };
 
     this.setState({ activeItem });
+  };
+
+  handleCategoriesChange = (categories) => {
+    const activeItem = { ...this.state.activeItem, ['categories']: categories };
+    this.setState({ activeItem });
+    
+    const categoryIds = categories.map(category => (category.value));
+    this.setState({ categoryIds })
   };
 
   render() {
@@ -57,12 +77,18 @@ export default class CustomModal extends Component {
                 placeholder="Enter Ingredient Description"
               />
             </FormGroup>
+            <FormGroup>
+              <CategorySelect 
+                selected_categories={this.state.activeItem.categories}
+                updateParentState={this.handleCategoriesChange.bind(this)}
+              />
+            </FormGroup>
           </Form>
         </ModalBody>
         <ModalFooter>
           <Button
             color="success"
-            onClick={() => onSave(this.state.activeItem)}
+            onClick={() => onSave(this.state.activeItem, this.state.categoryIds)}
           >
             Save
           </Button>

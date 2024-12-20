@@ -77,3 +77,26 @@ class LoginServiceTests(APITestCase):
         self.assertIsNotNone(response['refresh'])
         self.assertIsNotNone(response['access'])
         self.assertEqual(response['user']['id'], self.user.id)
+
+    def test_refresh(self):
+        """
+        Test refresh succeeds
+        """
+        validated_data = {
+            'username': 'test_user',
+            'password': 'Pass123!',
+        }
+
+        response = LoginService.login(validated_data)
+        self.assertIsNotNone(response['refresh'])
+        self.assertIsNotNone(response['access'])
+        self.assertEqual(response['user']['id'], self.user.id)
+        
+        validated_data = {
+            'refresh': response['refresh']
+        }
+
+        response = LoginService.refresh(validated_data)
+        self.assertIsNotNone(response['refresh'])
+        self.assertIsNotNone(response['access'])
+        self.assertEqual(LoginService.get_authenticated_user(response['access']).id, self.user.id)
