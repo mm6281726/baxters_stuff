@@ -20,7 +20,7 @@ class IngredientService:
     
     @staticmethod
     def create(validated_data) -> Dict:
-        validated_data['categories'] = IngredientService.__process_categoryids(validated_data)
+        validated_data['categories'] = IngredientService.__process_categoryids(validated_data['categories'])
         serializer = IngredientSerializer(data=validated_data)
         if serializer.is_valid():
             serializer.save()
@@ -29,7 +29,7 @@ class IngredientService:
     @staticmethod
     def update(id, validated_data) -> Dict:
         ingredient = IngredientService.__get(id=id)
-        validated_data['categories'] = IngredientService.__process_categoryids(validated_data)
+        validated_data['categories'] = IngredientService.__process_categoryids(validated_data['categories'])
         serializer = IngredientSerializer(instance=ingredient, data=validated_data)
         if serializer.is_valid():
             serializer.save()
@@ -46,5 +46,6 @@ class IngredientService:
         return Ingredient.objects.filter(id=id).first()
     
     @staticmethod
-    def __process_categoryids(validated_data):
-        return IngredientCategoryService.list(validated_data['categories'])
+    def __process_categoryids(categories):
+        categoryIds = [category.get('value') for category in categories]
+        return IngredientCategoryService.list(categoryIds)
