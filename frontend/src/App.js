@@ -9,6 +9,7 @@ import { Register } from "./auth/pages/Register";
 
 import GroceryLists from "./groceryList/pages/List";
 import Ingredients from "./ingredients/pages/List";
+import Categories from "./categories/pages/List";
 
 class App extends Component {
   constructor(props) {
@@ -30,6 +31,9 @@ class App extends Component {
               </Route>
               <Route element={<PrivateRoute />}>
                 <Route path="/ingredients" element={<Ingredients />} />
+              </Route>
+              <Route element={<PrivateRoute />}>
+                <Route path="/categories" element={<Categories />} />
               </Route>
             </Routes>
             </AuthProvider>
