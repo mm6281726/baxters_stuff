@@ -1,10 +1,20 @@
 import React, { Component } from "react";
 import { Button, Card, ListGroup, ListGroupItem, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
+import './List.css';
 
 import Modal from "../components/ListModal"
 
 import axios from "axios";
+
+// Wrapper function to use hooks with class component
+function withRouter(Component) {
+  return props => {
+    const navigate = useNavigate();
+    return <Component {...props} navigate={navigate} />;
+  }
+}
 
 class GroceryLists extends Component {
     constructor(props) {
@@ -65,7 +75,8 @@ class GroceryLists extends Component {
     };
 
     editItem = (item) => {
-        this.setState({ activeItem: item, modal: !this.state.modal });
+        // Navigate to the items page for this grocery list
+        this.props.navigate(`/grocerylist/${item.id}/items`);
     };
 
     displayCompleted = (status) => {
@@ -80,17 +91,21 @@ class GroceryLists extends Component {
         return (
             <Nav tabs>
                 <NavItem>
-                    <NavLink 
+                    <NavLink
                         className={classnames({ active: this.state.viewCompleted})}
                         onClick={() => this.displayCompleted(true)}
+                        href="#"
+                        style={{ cursor: 'pointer' }}
                     >
                         Complete
                     </NavLink>
                 </NavItem>
                 <NavItem>
-                    <NavLink 
+                    <NavLink
                         className={classnames({ active: !this.state.viewCompleted})}
                         onClick={() => this.displayCompleted(false)}
+                        href="#"
+                        style={{ cursor: 'pointer' }}
                     >
                         Incomplete
                     </NavLink>
@@ -118,7 +133,7 @@ class GroceryLists extends Component {
             >
                 <span
                     className={`
-                        grocerylist-title  
+                        grocerylist-title
                         ${this.state.viewCompleted ? "completed-grocerylist" : ""}
                     `}
                     title={item.description}
@@ -126,7 +141,7 @@ class GroceryLists extends Component {
                     {item.title}
                 </span>
                 <span>
-                    <Button 
+                    <Button
                         color="secondary"
                         onClick={() => this.editItem(item)}
                     >
@@ -170,7 +185,7 @@ class GroceryLists extends Component {
                         </Card>
                     </Col>
                 </Row>
-    
+
                 {this.state.modal ? (
                     <Modal
                         activeItem={this.state.activeItem}
@@ -183,4 +198,4 @@ class GroceryLists extends Component {
     }
 }
 
-export default GroceryLists
+export default withRouter(GroceryLists)

@@ -8,6 +8,7 @@ import { Login } from "./auth/pages/Login";
 import { Register } from "./auth/pages/Register";
 
 import GroceryLists from "./groceryList/pages/List";
+import GroceryListItems from "./groceryList/pages/Items";
 import Ingredients from "./ingredients/pages/List";
 import Categories from "./categories/pages/List";
 
@@ -28,6 +29,9 @@ class App extends Component {
               <Route path="/register" element={<Register />} />
               <Route element={<PrivateRoute />}>
                 <Route path="/" element={<GroceryLists />} />
+              </Route>
+              <Route element={<PrivateRoute />}>
+                <Route path="/grocerylist/:id/items" element={<GroceryListItems />} />
               </Route>
               <Route element={<PrivateRoute />}>
                 <Route path="/ingredients" element={<Ingredients />} />

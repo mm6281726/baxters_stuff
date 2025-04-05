@@ -1,0 +1,29 @@
+.nav-tabs .nav-link {
+    cursor: pointer;
+    color: #6c757d;
+    border-bottom: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link.active {
+    color: #007bff;
+    font-weight: bold;
+    border-color: #dee2e6 #dee2e6 #fff;
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: #495057;
+    border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.grocerylist-title {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.completed-grocerylist {
+    text-decoration: line-through;
+    color: #6c757d;
+}
