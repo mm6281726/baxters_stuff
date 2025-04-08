@@ -1,32 +1,19 @@
 import React, { Component } from "react";
-import { Button, Card, ListGroup, ListGroupItem, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
-import { useNavigate } from 'react-router-dom';
-import classnames from 'classnames';
-import './List.css';
+import { Button, Card, ListGroup, ListGroupItem, Row, Col } from 'reactstrap';
 
 import Modal from "../components/ListModal"
 
 import axios from "axios";
 
-// Wrapper function to use hooks with class component
-function withRouter(Component) {
-  return props => {
-    const navigate = useNavigate();
-    return <Component {...props} navigate={navigate} />;
-  }
-}
-
-class GroceryLists extends Component {
+class Categories extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            viewCompleted: false,
-            groceryList: [],
+            categoryList: [],
             modal: false,
             activeItem: {
                 title: "",
                 description: "",
-                completed: false,
             },
         };
     }
@@ -37,9 +24,9 @@ class GroceryLists extends Component {
 
     refreshList = () => {
         axios
-            .get("/api/grocerylist/")
+            .get("/api/ingredients/categories/")
             .then(
-                (res) => this.setState({ groceryList: res.data }),
+                (res) => this.setState({ categoryList: res.data }),
             )
             .catch((err) => console.log(err));
     };
@@ -53,95 +40,52 @@ class GroceryLists extends Component {
 
         if (item.id) {
             axios
-                .put(`/api/grocerylist/${item.id}/`, item)
+                .put(`/api/ingredients/categories/${item.id}/`, item)
                 .then((res) => this.refreshList());
         } else {
             axios
-                .post("/api/grocerylist/", item)
+                .post("/api/ingredients/categories/", item)
                 .then((res) => this.refreshList());
         }
     };
 
     handleDelete = (item) => {
         axios
-            .delete(`/api/grocerylist/${item.id}/`)
+            .delete(`/api/ingredients/categories/${item.id}/`)
             .then((res) => this.refreshList());
     };
 
     createItem = () => {
-        const item = { title: "", description: "", completed: false };
+        const item = { title: "", description: "", };
 
         this.setState({ activeItem: item, modal: !this.state.modal });
     };
 
     editItem = (item) => {
-        // Navigate to the items page for this grocery list
-        this.props.navigate(`/grocerylist/${item.id}/items`);
-    };
-
-    displayCompleted = (status) => {
-        if (status) {
-            return this.setState({ viewCompleted: true });
-        }
-
-        return this.setState({ viewCompleted: false });
-    };
-
-    renderTabList = () => {
-        return (
-            <Nav tabs>
-                <NavItem>
-                    <NavLink
-                        className={classnames({ active: this.state.viewCompleted})}
-                        onClick={() => this.displayCompleted(true)}
-                        href="#"
-                        style={{ cursor: 'pointer' }}
-                    >
-                        Complete
-                    </NavLink>
-                </NavItem>
-                <NavItem>
-                    <NavLink
-                        className={classnames({ active: !this.state.viewCompleted})}
-                        onClick={() => this.displayCompleted(false)}
-                        href="#"
-                        style={{ cursor: 'pointer' }}
-                    >
-                        Incomplete
-                    </NavLink>
-                </NavItem>
-            </Nav>
-        );
+        this.setState({ activeItem: item, modal: !this.state.modal });
     };
 
     renderItems = () => {
-        const { viewCompleted } = this.state;
-
-        const groceryList = this.state.groceryList;
-        if(!groceryList){
+        const categoryList = this.state.categoryList;
+        if(!categoryList){
             return;
         }
 
-        const newItems = groceryList.filter(
-            (item) => item.completed === viewCompleted
-        );
-
-        return newItems.map((item) => (
+        return categoryList.map((item) => (
             <ListGroupItem
                 key={item.id}
                 className="d-flex justify-content-between align-items-center"
             >
                 <span
                     className={`
-                        grocerylist-title
-                        ${this.state.viewCompleted ? "completed-grocerylist" : ""}
+                        categories-title
                     `}
                     title={item.description}
                 >
-                    {item.title}
+                    {item.name}
                 </span>
                 <span>
-                    <Button
+                    <Button 
                         color="secondary"
                         onClick={() => this.editItem(item)}
                     >
@@ -162,7 +106,7 @@ class GroceryLists extends Component {
     render(){
         return (
             <div>
-                <h1 className="text-uppercase text-center my-4">Grocery Lists</h1>
+                <h1 className="text-uppercase text-center my-4">Categories</h1>
                 <Row>
                     <Col
                         md="6"
@@ -175,17 +119,16 @@ class GroceryLists extends Component {
                                     color="primary"
                                     onClick={this.createItem}
                                 >
-                                    Add List
+                                    Add Category
                                 </Button>
                             </div>
-                            {this.renderTabList()}
                             <ListGroup flush className="border-top-0">
                                 {this.renderItems()}
                             </ListGroup>
                         </Card>
                     </Col>
                 </Row>
-
+    
                 {this.state.modal ? (
                     <Modal
                         activeItem={this.state.activeItem}
@@ -198,4 +141,4 @@ class GroceryLists extends Component {
     }
 }
 
-export default withRouter(GroceryLists)
+export default Categories
