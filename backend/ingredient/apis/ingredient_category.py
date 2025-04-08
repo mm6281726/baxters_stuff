@@ -17,8 +17,11 @@ class IngredientCategoryAPI:
         elif request.method == 'POST':
             logger.info('ingredients method "create" called')
             data = json.loads(request.body.decode("utf-8"))
-            return JsonResponse(IngredientCategoryService.create(validated_data=data))
-    
+            logger.info(f'Received data for category creation: {data}')
+            result = IngredientCategoryService.create(validated_data=data)
+            logger.info(f'Category creation result: {result}')
+            return JsonResponse(result)
+
     @staticmethod
     def detail(request, id) -> Dict:
         if request.method == 'GET':
