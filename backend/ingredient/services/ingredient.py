@@ -8,7 +8,8 @@ class IngredientService:
 
     @staticmethod
     def list() -> Dict:
-        ingredients = Ingredient.objects.all()
+        # Get all ingredients ordered by name
+        ingredients = Ingredient.objects.all().order_by('name')
         serializer = IngredientSerializer(ingredients, many=True)
         return serializer.data
 
@@ -47,22 +48,20 @@ class IngredientService:
 
     @staticmethod
     def __process_categoryids(categories):
-        # If categories is None or empty, return an empty list
         if not categories:
             return []
 
-        # If categories is already a list of integers (as in the tests),
-        # just pass it directly to IngredientCategoryService.list
-        if all(isinstance(category, int) for category in categories):
-            return IngredientCategoryService.list(categories)
-
-        # Otherwise, extract the category IDs from the objects
-        categoryIds = []
+        category_ids = []
         for category in categories:
-            if isinstance(category, dict):
-                # Try to get the ID from either 'value' or 'id' key
-                category_id = category.get('value') or category.get('id')
-                if category_id:
-                    categoryIds.append(category_id)
+            if isinstance(category, int):
+                category_ids.append(category)
+            elif isinstance(category, dict):
+                # Get first non-None value from any of these keys
+                for key in ['id', 'value', 'category_id']:
+                    if category.get(key) is not None:
+                        category_ids.append(category[key])
+                        break
 
-        return IngredientCategoryService.list(categoryIds)
+        category_ids = [cid for cid in category_ids if cid is not None]
+
+        return IngredientCategoryService.list(category_ids)

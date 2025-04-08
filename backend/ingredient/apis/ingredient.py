@@ -4,7 +4,6 @@ from django.http import JsonResponse
 from typing import Dict
 
 from ..services import IngredientService
-from ..services import IngredientCategoryService
 
 logger = logging.getLogger(__name__)
 
@@ -32,28 +31,3 @@ class IngredientAPI:
         elif request.method == 'DELETE':
             logger.info('ingredients method "delete" called')
             return JsonResponse(IngredientService.delete(id=id))
-        
-class IngredientCategoryAPI:
-
-    @staticmethod
-    def list(request) -> Dict:
-        if request.method == 'GET':
-            logger.info('ingredients method "list" called')
-            return JsonResponse(IngredientCategoryService.list(), safe=False)
-        elif request.method == 'POST':
-            logger.info('ingredients method "create" called')
-            data = json.loads(request.body.decode("utf-8"))
-            return JsonResponse(IngredientCategoryService.create(validated_data=data))
-    
-    @staticmethod
-    def detail(request, id) -> Dict:
-        if request.method == 'GET':
-            logger.info('ingredients method "get" called')
-            return JsonResponse(IngredientCategoryService.get(id))
-        elif request.method == 'PUT':
-            logger.info('ingredients method "update" called')
-            data = json.loads(request.body.decode("utf-8"))
-            return JsonResponse(IngredientCategoryService.update(id=id, validated_data=data))
-        elif request.method == 'DELETE':
-            logger.info('ingredients method "delete" called')
-            return JsonResponse(IngredientCategoryService.delete(id=id))

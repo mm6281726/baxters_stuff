@@ -2,6 +2,7 @@ import json
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
 from grocery_list.models import GroceryList
 
 User = get_user_model()
@@ -25,8 +26,12 @@ class GroceryListAPITest(TestCase):
         # Set up the API client
         self.client = APIClient()
 
-        # Authenticate the client
-        self.client.force_authenticate(user=self.user)
+        # Get token
+        refresh = RefreshToken.for_user(self.user)
+        access_token = str(refresh.access_token)
+
+        # Add token to client
+        self.client.credentials(HTTP_AUTHORIZATION=f'JWT {access_token}')
 
     def test_list_grocery_lists(self):
         """Test retrieving a list of grocery lists"""

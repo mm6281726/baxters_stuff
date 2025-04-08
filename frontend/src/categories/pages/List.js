@@ -12,7 +12,7 @@ class Categories extends Component {
             categoryList: [],
             modal: false,
             activeItem: {
-                title: "",
+                name: "",
                 description: "",
             },
         };
@@ -37,15 +37,28 @@ class Categories extends Component {
 
     handleSubmit = (item) => {
         this.toggle();
+        console.log('Submitting category:', item);
 
         if (item.id) {
             axios
                 .put(`/api/ingredients/categories/${item.id}/`, item)
-                .then((res) => this.refreshList());
+                .then((res) => {
+                    console.log('Category updated successfully:', res.data);
+                    this.refreshList();
+                })
+                .catch(err => {
+                    console.error('Error updating category:', err.response ? err.response.data : err);
+                });
         } else {
             axios
                 .post("/api/ingredients/categories/", item)
-                .then((res) => this.refreshList());
+                .then((res) => {
+                    console.log('Category created successfully:', res.data);
+                    this.refreshList();
+                })
+                .catch(err => {
+                    console.error('Error creating category:', err.response ? err.response.data : err);
+                });
         }
     };
 
@@ -56,7 +69,7 @@ class Categories extends Component {
     };
 
     createItem = () => {
-        const item = { title: "", description: "", };
+        const item = { name: "", description: "", };
 
         this.setState({ activeItem: item, modal: !this.state.modal });
     };
@@ -85,7 +98,7 @@ class Categories extends Component {
                     {item.name}
                 </span>
                 <span>
-                    <Button 
+                    <Button
                         color="secondary"
                         onClick={() => this.editItem(item)}
                     >
@@ -128,7 +141,7 @@ class Categories extends Component {
                         </Card>
                     </Col>
                 </Row>
-    
+
                 {this.state.modal ? (
                     <Modal
                         activeItem={this.state.activeItem}

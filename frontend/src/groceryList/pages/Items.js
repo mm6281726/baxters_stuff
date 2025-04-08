@@ -109,17 +109,46 @@ class GroceryListItems extends Component {
         this.props.navigate('/');
     };
 
-    renderItems = () => {
+    // Group items by category
+    groupItemsByCategory = () => {
         const items = this.state.items;
         if (!items || items.length === 0) {
-            return (
-                <ListGroupItem className="text-center">
-                    No items in this grocery list. Add some items!
-                </ListGroupItem>
-            );
+            return {};
         }
 
-        return items.map((item) => (
+        // Create a map of categories with their items
+        const categoryMap = {};
+
+        // Add "Uncategorized" group for items without categories
+        categoryMap["Uncategorized"] = [];
+
+        // Group items by category
+        items.forEach(item => {
+            const categories = item.ingredient_details?.categories || [];
+
+            if (categories.length === 0) {
+                categoryMap["Uncategorized"].push(item);
+            } else {
+                // Add the item to each of its categories
+                categories.forEach(category => {
+                    if (!categoryMap[category.name]) {
+                        categoryMap[category.name] = [];
+                    }
+                    categoryMap[category.name].push(item);
+                });
+            }
+        });
+
+        // Remove empty categories
+        if (categoryMap["Uncategorized"].length === 0) {
+            delete categoryMap["Uncategorized"];
+        }
+
+        return categoryMap;
+    };
+
+    renderGroceryItem = (item) => {
+        return (
             <ListGroupItem
                 key={item.id}
                 className="d-flex justify-content-between align-items-center"
@@ -156,7 +185,39 @@ class GroceryListItems extends Component {
                     </Button>
                 </span>
             </ListGroupItem>
-        ));
+        );
+    };
+
+    renderItems = () => {
+        const items = this.state.items;
+        if (!items || items.length === 0) {
+            return (
+                <ListGroupItem className="text-center">
+                    No items in this grocery list. Add some items!
+                </ListGroupItem>
+            );
+        }
+
+        const groupedItems = this.groupItemsByCategory();
+        const categoryNames = Object.keys(groupedItems).sort();
+
+        if (categoryNames.length === 0) {
+            return <div className="text-center">No items found</div>;
+        }
+
+        return categoryNames.map(categoryName => {
+            // Sort items alphabetically within each category (already sorted from backend)
+            const categoryItems = groupedItems[categoryName];
+
+            return (
+                <div key={categoryName} className="mb-4">
+                    <h5 className="category-header bg-light p-2 rounded">{categoryName}</h5>
+                    <ListGroup className="mb-3">
+                        {categoryItems.map(item => this.renderGroceryItem(item))}
+                    </ListGroup>
+                </div>
+            );
+        });
     };
 
     render() {

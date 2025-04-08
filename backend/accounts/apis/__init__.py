@@ -1,1 +1,2 @@
-from .rest import *
+from .user import UserAPI
+from .login import LoginAPI
