@@ -8,9 +8,9 @@ class IngredientCategoryService:
     @staticmethod
     def list(category_ids=None) -> Dict:
         if category_ids is None:
-            ingredientCategories = IngredientCategory.objects.all()
+            ingredientCategories = IngredientCategory.objects.all().order_by('name')
         else:
-            ingredientCategories = IngredientCategory.objects.filter(id__in=category_ids)
+            ingredientCategories = IngredientCategory.objects.filter(id__in=category_ids).order_by('name')
         serializer = IngredientCategorySerializer(ingredientCategories, many=True)
         return serializer.data
 
