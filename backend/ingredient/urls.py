@@ -1,5 +1,5 @@
 from django.urls import path
-from .apis.rest import IngredientAPI, IngredientCategoryAPI
+from .apis import IngredientAPI, IngredientCategoryAPI
 
 urlpatterns = [
     path('', IngredientAPI.list),

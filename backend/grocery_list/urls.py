@@ -1,5 +1,5 @@
 from django.urls import path
-from .apis.rest import GroceryListAPI, GroceryListItemAPI
+from .apis import GroceryListAPI, GroceryListItemAPI
 
 urlpatterns = [
     # Grocery List endpoints

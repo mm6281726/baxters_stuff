@@ -12,12 +12,12 @@ class LoginSerializer(serializers.Serializer):
         username = validated_data.get('username')
         password = validated_data.get('password')
         user = LoginSerializer.__get_user_by_username(username)
-        
+
         if(user is None):
             raise exceptions.AuthenticationFailed('user not found')
         if(not user.check_password(password)):
             raise exceptions.AuthenticationFailed('wrong password')
-        
+
         refresh = RefreshToken.for_user(user)
 
         return {
@@ -25,19 +25,7 @@ class LoginSerializer(serializers.Serializer):
             'access': str(refresh.access_token),
             'user': UserSerializer(user).data,
         }
-        
+
     def __get_user_by_username(username):
         User = get_user_model()
         return User.objects.filter(username=username).first()
-    
-    
-class LoginRefreshSerializer(serializers.Serializer):
-    refresh = serializers.CharField(max_length=512)
-
-    def validate(self, validated_data):
-        refresh = RefreshToken(validated_data.get('refresh'))
-        access = refresh.access_token
-        return {
-            'refresh': str(refresh),
-            'access': str(access),
-        }

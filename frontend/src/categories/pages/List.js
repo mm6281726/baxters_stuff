@@ -12,7 +12,7 @@ class Categories extends Component {
             categoryList: [],
             modal: false,
             activeItem: {
-                title: "",
+                name: "",
                 description: "",
             },
         };
@@ -56,7 +56,7 @@ class Categories extends Component {
     };
 
     createItem = () => {
-        const item = { title: "", description: "", };
+        const item = { name: "", description: "", };
 
         this.setState({ activeItem: item, modal: !this.state.modal });
     };
@@ -85,7 +85,7 @@ class Categories extends Component {
                     {item.name}
                 </span>
                 <span>
-                    <Button 
+                    <Button
                         color="secondary"
                         onClick={() => this.editItem(item)}
                     >
@@ -128,7 +128,7 @@ class Categories extends Component {
                         </Card>
                     </Col>
                 </Row>
-    
+
                 {this.state.modal ? (
                     <Modal
                         activeItem={this.state.activeItem}

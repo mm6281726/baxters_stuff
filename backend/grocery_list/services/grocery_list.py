@@ -1,48 +1,7 @@
-from typing import Dict, List
+from typing import Dict
 
-from ..models import GroceryList, GroceryListItem
-from ..serializers import GroceryListSerializer, GroceryListItemSerializer
-from ingredient.models import Ingredient
-
-class GroceryListItemService:
-
-    @staticmethod
-    def list(grocery_list_id) -> Dict:
-        items = GroceryListItem.objects.filter(grocery_list_id=grocery_list_id)
-        serializer = GroceryListItemSerializer(items, many=True)
-        return serializer.data
-
-    @staticmethod
-    def get(id) -> Dict:
-        item = GroceryListItemService.__get(id=id)
-        serializer = GroceryListItemSerializer(item)
-        return serializer.data
-
-    @staticmethod
-    def create(validated_data) -> Dict:
-        serializer = GroceryListItemSerializer(data=validated_data)
-        if serializer.is_valid():
-            serializer.save()
-        return serializer.data
-
-    @staticmethod
-    def update(id, validated_data) -> Dict:
-        item = GroceryListItemService.__get(id=id)
-        serializer = GroceryListItemSerializer(instance=item, data=validated_data)
-        if serializer.is_valid():
-            serializer.save()
-        return serializer.data
-
-    @staticmethod
-    def delete(id) -> Dict:
-        item = GroceryListItemService.__get(id=id)
-        item.delete()
-        return {"status_code": 200}
-
-    @staticmethod
-    def __get(id=id):
-        return GroceryListItem.objects.filter(id=id).first()
-
+from ..models import GroceryList
+from ..serializers import GroceryListSerializer
 
 class GroceryListService:
 
