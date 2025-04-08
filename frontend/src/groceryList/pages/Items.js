@@ -1,88 +1,129 @@
-import React, { Component } from "react";
-import { Button, Card, ListGroup, ListGroupItem, Row, Col } from 'reactstrap';
+import React, { useState, useEffect } from "react";
+import { Button, Card, ListGroup, Row, Col, Spinner, Alert } from 'reactstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 import ItemModal from "../components/ItemModal";
+import GroceryItem from "../components/GroceryItem";
+import CategoryGroup from "../components/CategoryGroup";
+import ItemSearch from "../components/ItemSearch";
+import ItemActions from "../components/ItemActions";
+import "./Items.css";
 
-// Wrapper function to use hooks with class component
-function withRouter(Component) {
-  return props => {
-    const params = useParams();
+const GroceryListItems = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
-    return <Component {...props} params={params} navigate={navigate} />;
-  }
-}
 
-class GroceryListItems extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            groceryListId: this.props.params.id,
-            groceryList: null,
-            items: [],
-            modal: false,
-            activeItem: {
-                grocery_list: this.props.params.id,
-                ingredient: null,
-                ingredient_details: null,
-                quantity: 1,
-                unit: "",
-                purchased: false,
-                notes: ""
-            },
-        };
-    }
+    const [groceryListId] = useState(id);
+    const [groceryList, setGroceryList] = useState(null);
+    const [items, setItems] = useState([]);
+    const [filteredItems, setFilteredItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [modal, setModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [viewMode, setViewMode] = useState("category");
+    const [showPurchased, setShowPurchased] = useState(true);
+    const [activeItem, setActiveItem] = useState({
+        grocery_list: id,
+        ingredient: null,
+        ingredient_details: null,
+        quantity: 1,
+        unit: "",
+        purchased: false,
+        notes: ""
+    });
 
-    componentDidMount() {
-        this.fetchGroceryList();
-        this.refreshList();
-    }
+    // Fetch grocery list and items on component mount
+    useEffect(() => {
+        fetchGroceryList();
+        refreshList();
+    }, []);
 
-    fetchGroceryList = () => {
-        axios
-            .get(`/api/grocerylist/${this.state.groceryListId}/`)
-            .then((res) => this.setState({ groceryList: res.data }))
-            .catch((err) => {
-                console.log(err);
-                this.props.navigate('/');
-            });
-    };
+    // Filter items when search term, view mode, or show purchased changes
+    useEffect(() => {
+        filterItems();
+    }, [items, searchTerm, showPurchased]);
 
-    refreshList = () => {
-        axios
-            .get(`/api/grocerylist/${this.state.groceryListId}/items/`)
-            .then((res) => this.setState({ items: res.data }))
-            .catch((err) => console.log(err));
-    };
-
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-    };
-
-    handleSubmit = (item) => {
-        this.toggle();
-
-        if (item.id) {
-            axios
-                .put(`/api/grocerylist/items/${item.id}/`, item)
-                .then((res) => this.refreshList());
-        } else {
-            axios
-                .post(`/api/grocerylist/${this.state.groceryListId}/items/`, item)
-                .then((res) => this.refreshList());
+    const fetchGroceryList = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/api/grocerylist/${groceryListId}/`);
+            setGroceryList(response.data);
+            setError("");
+        } catch (err) {
+            console.error("Error fetching grocery list:", err);
+            setError("Failed to load grocery list. Please try again.");
+            navigate('/');
+        } finally {
+            setLoading(false);
         }
     };
 
-    handleDelete = (item) => {
-        axios
-            .delete(`/api/grocerylist/items/${item.id}/`)
-            .then((res) => this.refreshList());
+    const refreshList = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get(`/api/grocerylist/${groceryListId}/items/`);
+            setItems(response.data);
+            setError("");
+        } catch (err) {
+            console.error("Error fetching grocery list items:", err);
+            setError("Failed to load grocery list items. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    createItem = () => {
+    const filterItems = () => {
+        let filtered = [...items];
+
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(item =>
+                item.ingredient_details?.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Filter by purchased status
+        if (!showPurchased) {
+            filtered = filtered.filter(item => !item.purchased);
+        }
+
+        setFilteredItems(filtered);
+    };
+
+    const toggle = () => {
+        setModal(!modal);
+    };
+
+    const handleSubmit = async (item) => {
+        toggle();
+        try {
+            if (item.id) {
+                await axios.put(`/api/grocerylist/items/${item.id}/`, item);
+            } else {
+                await axios.post(`/api/grocerylist/${groceryListId}/items/`, item);
+            }
+            refreshList();
+        } catch (err) {
+            console.error("Error saving item:", err);
+            setError("Failed to save item. Please try again.");
+        }
+    };
+
+    const handleDelete = async (item) => {
+        try {
+            await axios.delete(`/api/grocerylist/items/${item.id}/`);
+            refreshList();
+        } catch (err) {
+            console.error("Error deleting item:", err);
+            setError("Failed to delete item. Please try again.");
+        }
+    };
+
+    const createItem = () => {
         const item = {
-            grocery_list: this.state.groceryListId,
+            grocery_list: groceryListId,
             ingredient: null,
             ingredient_details: null,
             quantity: 1,
@@ -91,28 +132,71 @@ class GroceryListItems extends Component {
             notes: ""
         };
 
-        this.setState({ activeItem: item, modal: !this.state.modal });
+        setActiveItem(item);
+        setModal(true);
     };
 
-    editItem = (item) => {
-        this.setState({ activeItem: item, modal: !this.state.modal });
+    const editItem = (item) => {
+        setActiveItem(item);
+        setModal(true);
     };
 
-    togglePurchased = (item) => {
+    const togglePurchased = async (item) => {
         const updatedItem = { ...item, purchased: !item.purchased };
-        axios
-            .put(`/api/grocerylist/items/${item.id}/`, updatedItem)
-            .then((res) => this.refreshList());
+        try {
+            await axios.put(`/api/grocerylist/items/${item.id}/`, updatedItem);
+            refreshList();
+        } catch (err) {
+            console.error("Error updating item:", err);
+            setError("Failed to update item. Please try again.");
+        }
     };
 
-    goBack = () => {
-        this.props.navigate('/');
+    const markAllPurchased = async () => {
+        try {
+            setLoading(true);
+            const promises = filteredItems.map(item => {
+                if (!item.purchased) {
+                    return axios.put(`/api/grocerylist/items/${item.id}/`, { ...item, purchased: true });
+                }
+                return Promise.resolve();
+            });
+            await Promise.all(promises);
+            refreshList();
+        } catch (err) {
+            console.error("Error marking all as purchased:", err);
+            setError("Failed to mark all items as purchased. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const clearPurchased = async () => {
+        try {
+            setLoading(true);
+            const promises = items.map(item => {
+                if (item.purchased) {
+                    return axios.delete(`/api/grocerylist/items/${item.id}/`);
+                }
+                return Promise.resolve();
+            });
+            await Promise.all(promises);
+            refreshList();
+        } catch (err) {
+            console.error("Error clearing purchased items:", err);
+            setError("Failed to clear purchased items. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const goBack = () => {
+        navigate('/');
     };
 
     // Group items by category
-    groupItemsByCategory = () => {
-        const items = this.state.items;
-        if (!items || items.length === 0) {
+    const groupItemsByCategory = () => {
+        if (!filteredItems || filteredItems.length === 0) {
             return {};
         }
 
@@ -123,7 +207,7 @@ class GroceryListItems extends Component {
         categoryMap["Uncategorized"] = [];
 
         // Group items by category
-        items.forEach(item => {
+        filteredItems.forEach(item => {
             const categories = item.ingredient_details?.categories || [];
 
             if (categories.length === 0) {
@@ -147,129 +231,136 @@ class GroceryListItems extends Component {
         return categoryMap;
     };
 
-    renderGroceryItem = (item) => {
-        return (
-            <ListGroupItem
-                key={item.id}
-                className="d-flex justify-content-between align-items-center"
-            >
-                <div className="d-flex align-items-center">
-                    <input
-                        type="checkbox"
-                        checked={item.purchased}
-                        onChange={() => this.togglePurchased(item)}
-                        className="me-3"
-                    />
-                    <span
-                        className={`grocery-item-title ${item.purchased ? "text-decoration-line-through text-muted" : ""}`}
-                        title={item.notes}
-                    >
-                        {item.unit ? item.quantity : Math.round(item.quantity)} {item.unit} {item.ingredient_details?.name}
-                    </span>
-                </div>
-                <span>
-                    <Button
-                        color="secondary"
-                        onClick={() => this.editItem(item)}
-                        size="sm"
-                    >
-                        Edit
-                    </Button>
-                    {" "}
-                    <Button
-                        color="danger"
-                        onClick={() => this.handleDelete(item)}
-                        size="sm"
-                    >
-                        Delete
-                    </Button>
-                </span>
-            </ListGroupItem>
-        );
-    };
-
-    renderItems = () => {
-        const items = this.state.items;
-        if (!items || items.length === 0) {
+    const renderItems = () => {
+        if (loading) {
             return (
-                <ListGroupItem className="text-center">
-                    No items in this grocery list. Add some items!
-                </ListGroupItem>
-            );
-        }
-
-        const groupedItems = this.groupItemsByCategory();
-        const categoryNames = Object.keys(groupedItems).sort();
-
-        if (categoryNames.length === 0) {
-            return <div className="text-center">No items found</div>;
-        }
-
-        return categoryNames.map(categoryName => {
-            // Sort items alphabetically within each category (already sorted from backend)
-            const categoryItems = groupedItems[categoryName];
-
-            return (
-                <div key={categoryName} className="mb-4">
-                    <h5 className="category-header bg-light p-2 rounded">{categoryName}</h5>
-                    <ListGroup className="mb-3">
-                        {categoryItems.map(item => this.renderGroceryItem(item))}
-                    </ListGroup>
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
                 </div>
             );
-        });
-    };
-
-    render() {
-        const { groceryList } = this.state;
-
-        if (!groceryList) {
-            return <div className="text-center mt-5">Loading...</div>;
         }
 
-        return (
-            <div>
-                <h1 className="text-uppercase text-center my-4">
-                    {groceryList.title} - Items
-                </h1>
-                <Row>
-                    <Col
-                        md="8"
-                        sm="10"
-                        className="mx-auto p-0"
-                    >
-                        <Card className="p-3">
-                            <div className="mb-4 d-flex justify-content-between">
-                                <Button
-                                    color="secondary"
-                                    onClick={this.goBack}
-                                >
-                                    Back to Lists
-                                </Button>
-                                <Button
-                                    color="primary"
-                                    onClick={this.createItem}
-                                >
-                                    Add Item
-                                </Button>
-                            </div>
-                            <ListGroup flush className="border-top-0">
-                                {this.renderItems()}
-                            </ListGroup>
-                        </Card>
-                    </Col>
-                </Row>
+        if (!filteredItems || filteredItems.length === 0) {
+            return (
+                <div className="empty-state">
+                    <div className="empty-state-icon">📝</div>
+                    <h4>No items found</h4>
+                    <p>Add some items to your grocery list or adjust your search filters.</p>
+                    <Button color="primary" onClick={createItem}>Add Item</Button>
+                </div>
+            );
+        }
 
-                {this.state.modal ? (
-                    <ItemModal
-                        activeItem={this.state.activeItem}
-                        toggle={this.toggle}
-                        onSave={this.handleSubmit}
-                    />
-                ) : null}
+        if (viewMode === "category") {
+            const groupedItems = groupItemsByCategory();
+            const categoryNames = Object.keys(groupedItems).sort();
+
+            if (categoryNames.length === 0) {
+                return (
+                    <div className="empty-state">
+                        <div className="empty-state-icon">🔍</div>
+                        <h4>No matching items</h4>
+                        <p>Try adjusting your search filters.</p>
+                    </div>
+                );
+            }
+
+            return categoryNames.map(categoryName => (
+                <CategoryGroup
+                    key={categoryName}
+                    categoryName={categoryName}
+                    items={groupedItems[categoryName]}
+                    onTogglePurchased={togglePurchased}
+                    onEdit={editItem}
+                    onDelete={handleDelete}
+                />
+            ));
+        } else {
+            // Alphabetical view
+            const sortedItems = [...filteredItems].sort((a, b) =>
+                a.ingredient_details?.name.localeCompare(b.ingredient_details?.name)
+            );
+
+            return (
+                <ListGroup className="mb-3">
+                    {sortedItems.map(item => (
+                        <GroceryItem
+                            key={item.id}
+                            item={item}
+                            onTogglePurchased={togglePurchased}
+                            onEdit={editItem}
+                            onDelete={handleDelete}
+                        />
+                    ))}
+                </ListGroup>
+            );
+        }
+    };
+
+    if (loading && !groceryList) {
+        return (
+            <div className="text-center mt-5">
+                <Spinner color="primary" />
+                <p className="mt-2">Loading grocery list...</p>
             </div>
         );
     }
-}
 
-export default withRouter(GroceryListItems);
+    return (
+        <div className="grocery-list-items-container">
+            <h1 className="text-uppercase text-center my-4">
+                {groceryList?.title} - Items
+            </h1>
+
+            {error && <Alert color="danger" className="mx-auto" style={{ maxWidth: '800px' }}>{error}</Alert>}
+
+            <Row>
+                <Col
+                    lg="8"
+                    md="10"
+                    sm="12"
+                    className="mx-auto p-0"
+                >
+                    <Card className="p-4 shadow-sm">
+                        <div className="mb-4 d-flex justify-content-between">
+                            <Button
+                                color="secondary"
+                                onClick={goBack}
+                                className="d-flex align-items-center"
+                            >
+                                <span className="me-1">←</span> Back to Lists
+                            </Button>
+                        </div>
+
+                        <ItemSearch
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                            viewMode={viewMode}
+                            onViewModeChange={setViewMode}
+                            showPurchased={showPurchased}
+                            onShowPurchasedChange={setShowPurchased}
+                        />
+
+                        <ItemActions
+                            onAddItem={createItem}
+                            onMarkAllPurchased={markAllPurchased}
+                            onClearPurchased={clearPurchased}
+                        />
+
+                        {renderItems()}
+                    </Card>
+                </Col>
+            </Row>
+
+            {modal && (
+                <ItemModal
+                    activeItem={activeItem}
+                    toggle={toggle}
+                    onSave={handleSubmit}
+                />
+            )}
+        </div>
+    );
+};
+
+export default GroceryListItems;
