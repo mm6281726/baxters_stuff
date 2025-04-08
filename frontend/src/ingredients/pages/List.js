@@ -232,7 +232,7 @@ const Ingredients = () => {
 
     return (
         <div className="ingredients-container">
-            <h1 className="text-uppercase text-center my-4">Ingredients</h1>
+            <h1 className="text-center my-4">Ingredients</h1>
 
             {error && <Alert color="danger" className="mx-auto" style={{ maxWidth: '800px' }}>{error}</Alert>}
 

@@ -308,7 +308,7 @@ const GroceryListItems = () => {
 
     return (
         <div className="grocery-list-items-container">
-            <h1 className="text-uppercase text-center my-4">
+            <h1 className="text-center my-4">
                 {groceryList?.title} - Items
             </h1>
 

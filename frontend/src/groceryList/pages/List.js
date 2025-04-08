@@ -162,7 +162,7 @@ class GroceryLists extends Component {
     render(){
         return (
             <div>
-                <h1 className="text-uppercase text-center my-4">Grocery Lists</h1>
+                <h1 className="text-center my-4">Grocery Lists</h1>
                 <Row>
                     <Col
                         md="6"
