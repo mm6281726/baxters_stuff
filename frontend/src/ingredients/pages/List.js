@@ -67,13 +67,43 @@ class Ingredients extends Component {
         this.setState({ activeItem: item, modal: !this.state.modal });
     };
 
-    renderItems = () => {
+    // Group ingredients by category
+    groupIngredientsByCategory = () => {
         const ingredients = this.state.ingredients;
-        if(!ingredients){
-            return;
+        if (!ingredients || ingredients.length === 0) {
+            return {};
         }
 
-        return ingredients.map((item) => (
+        // Create a map of categories with their ingredients
+        const categoryMap = {};
+
+        // Add "Uncategorized" group for ingredients without categories
+        categoryMap["Uncategorized"] = [];
+
+        // Group ingredients by category
+        ingredients.forEach(ingredient => {
+            if (ingredient.categories.length === 0) {
+                categoryMap["Uncategorized"].push(ingredient);
+            } else {
+                ingredient.categories.forEach(category => {
+                    if (!categoryMap[category.name]) {
+                        categoryMap[category.name] = [];
+                    }
+                    categoryMap[category.name].push(ingredient);
+                });
+            }
+        });
+
+        // Remove empty categories
+        if (categoryMap["Uncategorized"].length === 0) {
+            delete categoryMap["Uncategorized"];
+        }
+
+        return categoryMap;
+    };
+
+    renderIngredientItem = (item) => {
+        return (
             <ListGroupItem
                 key={item.id}
                 className="d-flex justify-content-between align-items-center"
@@ -85,7 +115,7 @@ class Ingredients extends Component {
                     {item.name}
                 </span>
                 <span>
-                    <Button 
+                    <Button
                         color="secondary"
                         onClick={() => this.editItem(item)}
                     >
@@ -100,7 +130,32 @@ class Ingredients extends Component {
                     </Button>
                 </span>
             </ListGroupItem>
-        ));
+        );
+    };
+
+    renderItems = () => {
+        const groupedIngredients = this.groupIngredientsByCategory();
+        const categoryNames = Object.keys(groupedIngredients).sort();
+
+        if (categoryNames.length === 0) {
+            return <div className="text-center">No ingredients found</div>;
+        }
+
+        return categoryNames.map(categoryName => {
+            // Sort ingredients alphabetically within each category
+            const sortedIngredients = [...groupedIngredients[categoryName]].sort((a, b) =>
+                a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+            );
+
+            return (
+                <div key={categoryName} className="mb-4">
+                    <h5 className="category-header bg-light p-2 rounded">{categoryName}</h5>
+                    <ListGroup className="mb-3">
+                        {sortedIngredients.map(item => this.renderIngredientItem(item))}
+                    </ListGroup>
+                </div>
+            );
+        });
     };
 
     render(){
@@ -128,7 +183,7 @@ class Ingredients extends Component {
                         </Card>
                     </Col>
                 </Row>
-    
+
                 {this.state.modal ? (
                     <Modal
                         activeItem={this.state.activeItem}

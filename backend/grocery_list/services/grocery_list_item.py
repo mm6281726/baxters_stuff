@@ -7,7 +7,8 @@ class GroceryListItemService:
 
     @staticmethod
     def list(grocery_list_id) -> Dict:
-        items = GroceryListItem.objects.filter(grocery_list_id=grocery_list_id)
+        # Get items sorted by ingredient name for consistent ordering
+        items = GroceryListItem.objects.filter(grocery_list_id=grocery_list_id).order_by('ingredient__name')
         serializer = GroceryListItemSerializer(items, many=True)
         return serializer.data
 

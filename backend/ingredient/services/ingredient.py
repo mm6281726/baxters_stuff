@@ -8,7 +8,8 @@ class IngredientService:
 
     @staticmethod
     def list() -> Dict:
-        ingredients = Ingredient.objects.all()
+        # Get all ingredients ordered by name
+        ingredients = Ingredient.objects.all().order_by('name')
         serializer = IngredientSerializer(ingredients, many=True)
         return serializer.data
 
@@ -49,7 +50,7 @@ class IngredientService:
     def __process_categoryids(categories):
         if not categories:
             return []
-        
+
         category_ids = []
         for category in categories:
             if isinstance(category, int):
@@ -60,7 +61,7 @@ class IngredientService:
                     if category.get(key) is not None:
                         category_ids.append(category[key])
                         break
-        
+
         category_ids = [cid for cid in category_ids if cid is not None]
 
         return IngredientCategoryService.list(category_ids)
