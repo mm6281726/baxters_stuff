@@ -4,6 +4,7 @@ import { useLocation, Link } from 'react-router-dom';
 import './Navigation.css';
 
 import { useAuth } from "../hooks/AuthProvider";
+import NewestListRedirect from "../../groceryList/components/NewestListRedirect";
 
 export function Navigation() {
     const auth = useAuth();
@@ -31,7 +32,7 @@ export function Navigation() {
     return (
         <div>
             <Navbar color="light" light expand="md" className="mb-4">
-                <NavbarBrand tag={Link} to="/">Baxter's Stuff</NavbarBrand>
+                <NewestListRedirect>Baxter's Stuff</NewestListRedirect>
                 <Nav navbar>
                     {isAuth ? (
                         <NavItem>

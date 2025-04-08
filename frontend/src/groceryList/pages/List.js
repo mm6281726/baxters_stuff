@@ -1,99 +1,124 @@
-import React, { Component } from "react";
-import { Button, Card, ListGroup, ListGroupItem, Nav, NavItem, NavLink, Row, Col } from 'reactstrap';
+import React, { useState, useEffect } from "react";
+import { Card, ListGroup, Nav, NavItem, NavLink, Row, Col, Spinner, Alert } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
+import axios from "axios";
 import './List.css';
 
-import Modal from "../components/ListModal"
+import GroceryListModal from "../components/GroceryListModal";
+import GroceryListItem from "../components/GroceryListItem";
+import GroceryListSearch from "../components/GroceryListSearch";
+import GroceryListActions from "../components/GroceryListActions";
 
-import axios from "axios";
-
-// Wrapper function to use hooks with class component
-function withRouter(Component) {
-  return props => {
+const GroceryLists = () => {
     const navigate = useNavigate();
-    return <Component {...props} navigate={navigate} />;
-  }
-}
 
-class GroceryLists extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            viewCompleted: false,
-            groceryList: [],
-            modal: false,
-            activeItem: {
-                title: "",
-                description: "",
-                completed: false,
-            },
-        };
-    }
+    const [viewCompleted, setViewCompleted] = useState(false);
+    const [groceryLists, setGroceryLists] = useState([]);
+    const [filteredLists, setFilteredLists] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [modal, setModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeItem, setActiveItem] = useState({
+        title: "",
+        description: "",
+        completed: false,
+    });
 
-    componentDidMount() {
-        this.refreshList();
-    }
+    // Fetch grocery lists on component mount
+    useEffect(() => {
+        refreshList();
+    }, []);
 
-    refreshList = () => {
-        axios
-            .get("/api/grocerylist/")
-            .then(
-                (res) => this.setState({ groceryList: res.data }),
-            )
-            .catch((err) => console.log(err));
-    };
+    // Filter lists when search term or view completed changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        filterLists();
+    }, [groceryLists, searchTerm, viewCompleted]);
 
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-    };
-
-    handleSubmit = (item) => {
-        this.toggle();
-
-        if (item.id) {
-            axios
-                .put(`/api/grocerylist/${item.id}/`, item)
-                .then((res) => this.refreshList());
-        } else {
-            axios
-                .post("/api/grocerylist/", item)
-                .then((res) => this.refreshList());
+    const refreshList = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get("/api/grocerylist/");
+            setGroceryLists(response.data);
+            setError("");
+        } catch (err) {
+            console.error("Error fetching grocery lists:", err);
+            setError("Failed to load grocery lists. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    handleDelete = (item) => {
-        axios
-            .delete(`/api/grocerylist/${item.id}/`)
-            .then((res) => this.refreshList());
+    const filterLists = () => {
+        let filtered = [...groceryLists];
+
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(list =>
+                list.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (list.description && list.description.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+        }
+
+        // Filter by completed status
+        filtered = filtered.filter(list => list.completed === viewCompleted);
+
+        setFilteredLists(filtered);
     };
 
-    createItem = () => {
+    const toggle = () => {
+        setModal(!modal);
+    };
+
+    const handleSubmit = async (item) => {
+        toggle();
+        try {
+            if (item.id) {
+                await axios.put(`/api/grocerylist/${item.id}/`, item);
+            } else {
+                await axios.post("/api/grocerylist/", item);
+            }
+            refreshList();
+        } catch (err) {
+            console.error("Error saving grocery list:", err);
+            setError("Failed to save grocery list. Please try again.");
+        }
+    };
+
+    const handleDelete = async (item) => {
+        try {
+            await axios.delete(`/api/grocerylist/${item.id}/`);
+            refreshList();
+        } catch (err) {
+            console.error("Error deleting grocery list:", err);
+            setError("Failed to delete grocery list. Please try again.");
+        }
+    };
+
+    const createItem = () => {
         const item = { title: "", description: "", completed: false };
-
-        this.setState({ activeItem: item, modal: !this.state.modal });
+        setActiveItem(item);
+        setModal(true);
     };
 
-    editItem = (item) => {
+    const viewItems = (item) => {
         // Navigate to the items page for this grocery list
-        this.props.navigate(`/grocerylist/${item.id}/items`);
+        navigate(`/grocerylist/${item.id}/items`);
     };
 
-    displayCompleted = (status) => {
-        if (status) {
-            return this.setState({ viewCompleted: true });
-        }
-
-        return this.setState({ viewCompleted: false });
+    const displayCompleted = (status) => {
+        setViewCompleted(status);
     };
 
-    renderTabList = () => {
+    const renderTabList = () => {
         return (
-            <Nav tabs>
+            <Nav tabs className="mb-3">
                 <NavItem>
                     <NavLink
-                        className={classnames({ active: this.state.viewCompleted})}
-                        onClick={() => this.displayCompleted(true)}
+                        className={classnames({ active: viewCompleted})}
+                        onClick={() => displayCompleted(true)}
                         href="#"
                         style={{ cursor: 'pointer' }}
                     >
@@ -102,8 +127,8 @@ class GroceryLists extends Component {
                 </NavItem>
                 <NavItem>
                     <NavLink
-                        className={classnames({ active: !this.state.viewCompleted})}
-                        onClick={() => this.displayCompleted(false)}
+                        className={classnames({ active: !viewCompleted})}
+                        onClick={() => displayCompleted(false)}
                         href="#"
                         style={{ cursor: 'pointer' }}
                     >
@@ -114,88 +139,89 @@ class GroceryLists extends Component {
         );
     };
 
-    renderItems = () => {
-        const { viewCompleted } = this.state;
-
-        const groceryList = this.state.groceryList;
-        if(!groceryList){
-            return;
+    const renderLists = () => {
+        if (loading) {
+            return (
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                </div>
+            );
         }
 
-        const newItems = groceryList.filter(
-            (item) => item.completed === viewCompleted
-        );
+        if (!filteredLists || filteredLists.length === 0) {
+            return (
+                <div className="empty-state">
+                    <div className="empty-state-icon">📝</div>
+                    <h4>No grocery lists found</h4>
+                    <p>{viewCompleted ?
+                        "You don't have any completed grocery lists." :
+                        "Add a new grocery list to get started."}</p>
+                </div>
+            );
+        }
 
-        return newItems.map((item) => (
-            <ListGroupItem
-                key={item.id}
-                className="d-flex justify-content-between align-items-center"
-            >
-                <span
-                    className={`
-                        grocerylist-title
-                        ${this.state.viewCompleted ? "completed-grocerylist" : ""}
-                    `}
-                    title={item.description}
-                >
-                    {item.title}
-                </span>
-                <span>
-                    <Button
-                        color="secondary"
-                        onClick={() => this.editItem(item)}
-                    >
-                        Edit
-                    </Button>
-                    {" "}
-                    <Button
-                        color="danger"
-                        onClick={() => this.handleDelete(item)}
-                    >
-                        Delete
-                    </Button>
-                </span>
-            </ListGroupItem>
-        ));
+        return (
+            <ListGroup flush className="border-top-0">
+                {filteredLists.map(list => (
+                    <GroceryListItem
+                        key={list.id}
+                        list={list}
+                        onView={viewItems}
+                        onDelete={handleDelete}
+                        isCompleted={viewCompleted}
+                    />
+                ))}
+            </ListGroup>
+        );
     };
 
-    render(){
+    if (loading && groceryLists.length === 0) {
         return (
-            <div>
-                <h1 className="text-center my-4">Grocery Lists</h1>
-                <Row>
-                    <Col
-                        md="6"
-                        sm="10"
-                        className="mx-auto p-0"
-                    >
-                        <Card className="p-3">
-                            <div className="mb-4">
-                                <Button
-                                    color="primary"
-                                    onClick={this.createItem}
-                                >
-                                    Add List
-                                </Button>
-                            </div>
-                            {this.renderTabList()}
-                            <ListGroup flush className="border-top-0">
-                                {this.renderItems()}
-                            </ListGroup>
-                        </Card>
-                    </Col>
-                </Row>
-
-                {this.state.modal ? (
-                    <Modal
-                        activeItem={this.state.activeItem}
-                        toggle={this.toggle}
-                        onSave={this.handleSubmit}
-                    />
-                ) : null}
+            <div className="text-center mt-5">
+                <Spinner color="primary" />
+                <p className="mt-2">Loading grocery lists...</p>
             </div>
         );
     }
-}
 
-export default withRouter(GroceryLists)
+    return (
+        <div className="grocery-lists-container">
+            <h1 className="text-center my-4">Grocery Lists</h1>
+
+            {error && <Alert color="danger" className="mx-auto" style={{ maxWidth: '800px' }}>{error}</Alert>}
+
+            <Row>
+                <Col
+                    lg="8"
+                    md="10"
+                    sm="12"
+                    className="mx-auto p-0"
+                >
+                    <Card className="p-4 shadow-sm">
+                        <GroceryListSearch
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                        />
+
+                        <GroceryListActions
+                            onAddList={createItem}
+                        />
+
+                        {renderTabList()}
+                        {renderLists()}
+                    </Card>
+                </Col>
+            </Row>
+
+            {modal && (
+                <GroceryListModal
+                    activeItem={activeItem}
+                    toggle={toggle}
+                    onSave={handleSubmit}
+                />
+            )}
+        </div>
+    );
+};
+
+export default GroceryLists;

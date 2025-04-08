@@ -309,7 +309,7 @@ const GroceryListItems = () => {
     return (
         <div className="grocery-list-items-container">
             <h1 className="text-center my-4">
-                {groceryList?.title} - Items
+                {groceryList?.title}
             </h1>
 
             {error && <Alert color="danger" className="mx-auto" style={{ maxWidth: '800px' }}>{error}</Alert>}
