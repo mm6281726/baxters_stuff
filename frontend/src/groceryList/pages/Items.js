@@ -3,6 +3,8 @@ import { Button, Card, ListGroup, Row, Col, Spinner, Alert } from 'reactstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal";
+
 import ItemModal from "../components/ItemModal";
 import GroceryItem from "../components/GroceryItem";
 import CategoryGroup from "../components/CategoryGroup";
@@ -24,6 +26,7 @@ const GroceryListItems = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [viewMode, setViewMode] = useState("category");
     const [showPurchased, setShowPurchased] = useState(true);
+    const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
     const [activeItem, setActiveItem] = useState({
         grocery_list: id,
         ingredient: null,
@@ -194,6 +197,20 @@ const GroceryListItems = () => {
         navigate('/');
     };
 
+    const deleteList = async () => {
+        try {
+            await axios.delete(`/api/grocerylist/${groceryListId}/`);
+            navigate('/');
+        } catch (err) {
+            console.error("Error deleting grocery list:", err);
+            setError("Failed to delete grocery list. Please try again.");
+        }
+    };
+
+    const confirmDeleteList = () => {
+        setDeleteConfirmationModal(true);
+    };
+
     // Group items by category
     const groupItemsByCategory = () => {
         if (!filteredItems || filteredItems.length === 0) {
@@ -345,12 +362,22 @@ const GroceryListItems = () => {
                             onAddItem={createItem}
                             onMarkAllPurchased={markAllPurchased}
                             onClearPurchased={clearPurchased}
+                            onDeleteList={confirmDeleteList}
                         />
 
                         {renderItems()}
                     </Card>
                 </Col>
             </Row>
+
+            {deleteConfirmationModal && (
+                <DeleteConfirmationModal
+                    isOpen={deleteConfirmationModal}
+                    toggle={() => setDeleteConfirmationModal(!deleteConfirmationModal)}
+                    onConfirm={deleteList}
+                    itemName={groceryList?.title}
+                />
+            )}
 
             {modal && (
                 <ItemModal

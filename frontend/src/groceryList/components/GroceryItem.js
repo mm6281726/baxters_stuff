@@ -3,16 +3,28 @@ import { ListGroupItem, Button } from 'reactstrap';
 import '../pages/Items.css';
 
 const GroceryItem = ({ item, onTogglePurchased, onEdit, onDelete }) => {
+  const handleRowClick = (e) => {
+    // Only toggle if not clicking on buttons or checkbox
+    if (!e.target.closest('.grocery-item-actions') && !e.target.closest('.grocery-item-checkbox')) {
+      onTogglePurchased(item);
+    }
+  };
+
   return (
     <ListGroupItem
       key={item.id}
       className={`d-flex justify-content-between align-items-center grocery-item ${item.purchased ? 'purchased' : ''}`}
+      onClick={handleRowClick}
+      style={{ cursor: 'pointer' }}
     >
       <div className="d-flex align-items-center">
         <input
           type="checkbox"
           checked={item.purchased}
-          onChange={() => onTogglePurchased(item)}
+          onChange={(e) => {
+            e.stopPropagation(); // Prevent row click handler from firing
+            onTogglePurchased(item);
+          }}
           className="grocery-item-checkbox me-3"
           aria-label={`Mark ${item.ingredient_details?.name} as ${item.purchased ? 'not purchased' : 'purchased'}`}
         />
@@ -27,7 +39,10 @@ const GroceryItem = ({ item, onTogglePurchased, onEdit, onDelete }) => {
       <div className="grocery-item-actions">
         <Button
           color="secondary"
-          onClick={() => onEdit(item)}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent row click handler from firing
+            onEdit(item);
+          }}
           size="sm"
           className="me-2"
         >
@@ -35,7 +50,10 @@ const GroceryItem = ({ item, onTogglePurchased, onEdit, onDelete }) => {
         </Button>
         <Button
           color="danger"
-          onClick={() => onDelete(item)}
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent row click handler from firing
+            onDelete(item);
+          }}
           size="sm"
         >
           Delete

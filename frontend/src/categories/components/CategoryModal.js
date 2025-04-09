@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 import "../pages/List.css";
 
-const CategoryModal = ({ activeItem: initialItem, toggle, onSave }) => {
+const CategoryModal = ({ activeItem: initialItem, toggle, onSave, onDelete }) => {
   const [activeItem, setActiveItem] = useState(initialItem);
   const [error, setError] = useState("");
 
@@ -71,16 +71,31 @@ const CategoryModal = ({ activeItem: initialItem, toggle, onSave }) => {
           </FormGroup>
         </Form>
       </ModalBody>
-      <ModalFooter className="bg-light">
-        <Button color="secondary" onClick={toggle}>
-          Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={handleSubmit}
-        >
-          Save
-        </Button>
+      <ModalFooter className="bg-light d-flex justify-content-between">
+        <div>
+          {activeItem.id && (
+            <Button
+              color="danger"
+              onClick={() => {
+                toggle();
+                onDelete(activeItem);
+              }}
+            >
+              Delete
+            </Button>
+          )}
+        </div>
+        <div>
+          <Button color="secondary" onClick={toggle} className="me-2">
+            Cancel
+          </Button>
+          <Button
+            color="primary"
+            onClick={handleSubmit}
+          >
+            Save
+          </Button>
+        </div>
       </ModalFooter>
     </Modal>
   );

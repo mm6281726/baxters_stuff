@@ -3,7 +3,7 @@ import { ListGroup } from 'reactstrap';
 import IngredientItem from './IngredientItem';
 import '../pages/List.css';
 
-const CategoryGroup = ({ categoryName, ingredients, onEdit, onDelete }) => {
+const CategoryGroup = ({ categoryName, ingredients, onEdit }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleCollapse = () => {
@@ -12,7 +12,7 @@ const CategoryGroup = ({ categoryName, ingredients, onEdit, onDelete }) => {
 
   return (
     <div className="mb-4">
-      <div 
+      <div
         className={`category-header ${isCollapsed ? 'collapsed' : ''}`}
         onClick={toggleCollapse}
       >
@@ -21,7 +21,7 @@ const CategoryGroup = ({ categoryName, ingredients, onEdit, onDelete }) => {
           {isCollapsed ? '▶' : '▼'}
         </span>
       </div>
-      
+
       {!isCollapsed && (
         <ListGroup className="mb-3">
           {ingredients.map(ingredient => (
@@ -29,7 +29,6 @@ const CategoryGroup = ({ categoryName, ingredients, onEdit, onDelete }) => {
               key={ingredient.id}
               ingredient={ingredient}
               onEdit={onEdit}
-              onDelete={onDelete}
             />
           ))}
         </ListGroup>

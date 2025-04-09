@@ -1,12 +1,18 @@
 import React from 'react';
-import { ListGroupItem, Button } from 'reactstrap';
+import { ListGroupItem } from 'reactstrap';
 import '../pages/List.css';
 
-const IngredientItem = ({ ingredient, onEdit, onDelete }) => {
+const IngredientItem = ({ ingredient, onEdit }) => {
+  const handleRowClick = () => {
+    onEdit(ingredient);
+  };
+
   return (
     <ListGroupItem
       key={ingredient.id}
       className="d-flex justify-content-between align-items-center ingredient-item"
+      onClick={handleRowClick}
+      style={{ cursor: 'pointer' }}
     >
       <div>
         <div className="ingredient-title">
@@ -18,23 +24,7 @@ const IngredientItem = ({ ingredient, onEdit, onDelete }) => {
           </div>
         )}
       </div>
-      <div className="ingredient-actions">
-        <Button
-          color="secondary"
-          onClick={() => onEdit(ingredient)}
-          size="sm"
-          className="me-2"
-        >
-          Edit
-        </Button>
-        <Button
-          color="danger"
-          onClick={() => onDelete(ingredient)}
-          size="sm"
-        >
-          Delete
-        </Button>
-      </div>
+
     </ListGroupItem>
   );
 };

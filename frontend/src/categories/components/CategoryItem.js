@@ -1,12 +1,18 @@
 import React from 'react';
-import { ListGroupItem, Button } from 'reactstrap';
+import { ListGroupItem } from 'reactstrap';
 import '../pages/List.css';
 
-const CategoryItem = ({ category, onEdit, onDelete }) => {
+const CategoryItem = ({ category, onEdit }) => {
+  const handleRowClick = () => {
+    onEdit(category);
+  };
+
   return (
     <ListGroupItem
       key={category.id}
       className="d-flex justify-content-between align-items-center category-item"
+      onClick={handleRowClick}
+      style={{ cursor: 'pointer' }}
     >
       <div>
         <div className="category-title">
@@ -18,23 +24,7 @@ const CategoryItem = ({ category, onEdit, onDelete }) => {
           </div>
         )}
       </div>
-      <div className="category-actions">
-        <Button
-          color="secondary"
-          onClick={() => onEdit(category)}
-          size="sm"
-          className="me-2"
-        >
-          Edit
-        </Button>
-        <Button
-          color="danger"
-          onClick={() => onDelete(category)}
-          size="sm"
-        >
-          Delete
-        </Button>
-      </div>
+
     </ListGroupItem>
   );
 };

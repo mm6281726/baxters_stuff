@@ -23,11 +23,13 @@
 .grocery-list-item {
     transition: all 0.2s ease;
     border-left: 3px solid transparent;
+    cursor: pointer;
 }
 
 .grocery-list-item:hover {
     background-color: #f8f9fa;
     border-left-color: #007bff;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
 }
 
 .grocery-list-item.completed {

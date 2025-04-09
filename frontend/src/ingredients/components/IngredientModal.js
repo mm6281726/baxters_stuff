@@ -14,7 +14,7 @@ import {
 import CategorySelect from "./CategorySelect";
 import "../pages/List.css";
 
-const IngredientModal = ({ activeItem: initialItem, toggle, onSave }) => {
+const IngredientModal = ({ activeItem: initialItem, toggle, onSave, onDelete }) => {
   const [activeItem, setActiveItem] = useState(initialItem);
   const [categoryIds, setCategoryIds] = useState([]);
   const [error, setError] = useState("");
@@ -92,16 +92,31 @@ const IngredientModal = ({ activeItem: initialItem, toggle, onSave }) => {
           </FormGroup>
         </Form>
       </ModalBody>
-      <ModalFooter className="bg-light">
-        <Button color="secondary" onClick={toggle}>
-          Cancel
-        </Button>
-        <Button
-          color="success"
-          onClick={handleSubmit}
-        >
-          Save
-        </Button>
+      <ModalFooter className="bg-light d-flex justify-content-between">
+        <div>
+          {activeItem.id && (
+            <Button
+              color="danger"
+              onClick={() => {
+                toggle();
+                onDelete(activeItem);
+              }}
+            >
+              Delete
+            </Button>
+          )}
+        </div>
+        <div>
+          <Button color="secondary" onClick={toggle} className="me-2">
+            Cancel
+          </Button>
+          <Button
+            color="success"
+            onClick={handleSubmit}
+          >
+            Save
+          </Button>
+        </div>
       </ModalFooter>
     </Modal>
   );

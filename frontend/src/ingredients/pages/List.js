@@ -268,6 +268,7 @@ const Ingredients = () => {
                     activeItem={activeItem}
                     toggle={toggle}
                     onSave={handleSubmit}
+                    onDelete={handleDelete}
                 />
             )}
         </div>

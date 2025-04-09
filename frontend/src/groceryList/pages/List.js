@@ -98,7 +98,20 @@ const GroceryLists = () => {
     };
 
     const createItem = () => {
-        const item = { title: "", description: "", completed: false };
+        // Format current date for the default title in MM/dd/yyyy format
+        const currentDate = new Date();
+        const formattedDate = currentDate.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+        });
+
+        const item = {
+            title: `Grocery List - ${formattedDate}`,
+            description: "",
+            completed: false
+        };
+
         setActiveItem(item);
         setModal(true);
     };
@@ -167,7 +180,6 @@ const GroceryLists = () => {
                         key={list.id}
                         list={list}
                         onView={viewItems}
-                        onDelete={handleDelete}
                         isCompleted={viewCompleted}
                     />
                 ))}
