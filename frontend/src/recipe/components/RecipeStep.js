@@ -4,7 +4,7 @@ import '../pages/Detail.css';
 
 const RecipeStep = ({ step, onEdit, onDelete }) => {
   const handleRowClick = (e) => {
-    // Only edit if not clicking on buttons
+    // Only edit if not clicking on delete button
     if (!e.target.closest('.recipe-step-actions')) {
       onEdit(step);
     }
@@ -24,17 +24,6 @@ const RecipeStep = ({ step, onEdit, onDelete }) => {
         </div>
       </div>
       <div className="recipe-step-actions">
-        <Button
-          color="secondary"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click handler from firing
-            onEdit(step);
-          }}
-          size="sm"
-          className="me-2"
-        >
-          Edit
-        </Button>
         <Button
           color="danger"
           onClick={(e) => {

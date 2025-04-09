@@ -1,11 +1,16 @@
 /* Recipe Detail Page Styles */
 
 /* Action buttons */
-.recipe-actions {
+.recipe-detail-action-buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 20px;
+}
+
+.recipe-detail-action-buttons .btn {
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 /* Category styling */

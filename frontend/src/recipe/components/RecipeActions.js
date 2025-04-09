@@ -4,7 +4,7 @@ import '../pages/List.css';
 
 const RecipeActions = ({ onAddRecipe }) => {
   return (
-    <div className="d-flex justify-content-between mb-4">
+    <div className="recipe-action-buttons mb-4">
       <Button
         color="primary"
         onClick={onAddRecipe}

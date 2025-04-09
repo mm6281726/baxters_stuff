@@ -4,7 +4,7 @@ import '../pages/Detail.css';
 
 const RecipeIngredient = ({ item, onEdit, onDelete }) => {
   const handleRowClick = (e) => {
-    // Only edit if not clicking on buttons
+    // Only edit if not clicking on delete button
     if (!e.target.closest('.recipe-ingredient-actions')) {
       onEdit(item);
     }
@@ -24,17 +24,6 @@ const RecipeIngredient = ({ item, onEdit, onDelete }) => {
         {item.notes && <small className="text-muted">{item.notes}</small>}
       </div>
       <div className="recipe-ingredient-actions">
-        <Button
-          color="secondary"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click handler from firing
-            onEdit(item);
-          }}
-          size="sm"
-          className="me-2"
-        >
-          Edit
-        </Button>
         <Button
           color="danger"
           onClick={(e) => {

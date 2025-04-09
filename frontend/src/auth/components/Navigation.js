@@ -53,28 +53,6 @@ export function Navigation() {
                         <NavItem>
                             <NavLink
                                 tag={Link}
-                                to="/ingredients"
-                                className={isActive('/ingredients') ? 'active' : ''}
-                            >
-                                Ingredients
-                            </NavLink>
-                        </NavItem>
-                    ) : null}
-                    {isAuth ? (
-                        <NavItem>
-                            <NavLink
-                                tag={Link}
-                                to="/categories"
-                                className={isActive('/categories') ? 'active' : ''}
-                            >
-                                Categories
-                            </NavLink>
-                        </NavItem>
-                    ) : null}
-                    {isAuth ? (
-                        <NavItem>
-                            <NavLink
-                                tag={Link}
                                 to="/pantry"
                                 className={isActive('/pantry') ? 'active' : ''}
                             >
@@ -90,6 +68,28 @@ export function Navigation() {
                                 className={isActive('/recipes') ? 'active' : ''}
                             >
                                 Recipes
+                            </NavLink>
+                        </NavItem>
+                    ) : null}
+                    {isAuth ? (
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/ingredients"
+                                className={isActive('/ingredients') ? 'active' : ''}
+                            >
+                                Ingredients
+                            </NavLink>
+                        </NavItem>
+                    ) : null}
+                    {isAuth ? (
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/categories"
+                                className={isActive('/categories') ? 'active' : ''}
+                            >
+                                Categories
                             </NavLink>
                         </NavItem>
                     ) : null}

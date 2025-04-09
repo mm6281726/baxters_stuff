@@ -1,5 +1,15 @@
 /* Recipe List Page Styles */
 
+/* Recipe action buttons */
+.recipe-action-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.recipe-action-buttons .btn {
+  opacity: 1;
+}
+
 /* Recipe item styling */
 .recipe-item {
   transition: all 0.2s ease;

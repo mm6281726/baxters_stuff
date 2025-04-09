@@ -4,7 +4,7 @@ import '../pages/Detail.css';
 
 const RecipeDetailActions = ({ onAddItem, onAddStep, onDeleteRecipe, onAddToGroceryList }) => {
   return (
-    <div className="recipe-actions mb-4">
+    <div className="recipe-detail-action-buttons mb-4">
       <Button
         color="primary"
         onClick={onAddItem}
