@@ -13,10 +13,10 @@ import {
   Col,
   Alert
 } from "reactstrap";
-import IngredientSelect from "./IngredientSelect";
-import "../pages/Items.css";
+import IngredientSelect from "../../groceryList/components/IngredientSelect";
+import "../pages/List.css";
 
-const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
+const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
   const [activeItem, setActiveItem] = useState(initialItem);
   const [error, setError] = useState("");
 
@@ -28,9 +28,7 @@ const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
     let { name, value } = e.target;
     const updatedItem = { ...activeItem };
 
-    if (e.target.type === "checkbox") {
-      value = e.target.checked;
-    } else if (name === "quantity") {
+    if (name === "quantity") {
       // If no unit is assigned, convert quantity to integer
       if (!updatedItem.unit) {
         value = parseInt(value) || 1; // Default to 1 if parsing fails
@@ -81,7 +79,7 @@ const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
   return (
     <Modal isOpen={true} toggle={toggle} size="lg">
       <ModalHeader toggle={toggle} className="bg-light">
-        <span className="fw-bold">{activeItem.id ? 'Edit' : 'Add'} Grocery List Item</span>
+        <span className="fw-bold">{activeItem.id ? 'Edit' : 'Add'} Pantry Item</span>
       </ModalHeader>
       <ModalBody>
         {error && <Alert color="danger">{error}</Alert>}
@@ -104,11 +102,10 @@ const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
                   type="number"
                   id="item-quantity"
                   name="quantity"
-                  value={activeItem.quantity}
+                  value={activeItem.quantity || ""}
                   onChange={handleChange}
                   min="0.01"
                   step={activeItem.unit ? "0.01" : "1"}
-                  className="form-control-lg"
                 />
               </FormGroup>
             </Col>
@@ -121,24 +118,12 @@ const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
                   name="unit"
                   value={activeItem.unit || ""}
                   onChange={handleChange}
-                  className="form-control-lg"
                 >
                   <option value="">No Unit</option>
                   {commonUnits.map(unit => (
                     <option key={unit} value={unit}>{unit}</option>
                   ))}
                 </Input>
-                <small className="text-muted">If your unit isn't listed, you can type it directly</small>
-                {!activeItem.unit && (
-                  <Input
-                    type="text"
-                    placeholder="Custom unit"
-                    name="unit"
-                    value={activeItem.unit || ""}
-                    onChange={handleChange}
-                    className="mt-2"
-                  />
-                )}
               </FormGroup>
             </Col>
           </Row>
@@ -153,21 +138,6 @@ const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
               placeholder="Add any notes about this item"
               rows="3"
             />
-          </FormGroup>
-          <FormGroup check className="mb-3">
-            <div className="form-check form-switch">
-              <Input
-                type="checkbox"
-                className="form-check-input"
-                id="item-purchased"
-                name="purchased"
-                checked={activeItem.purchased}
-                onChange={handleChange}
-              />
-              <Label check for="item-purchased" className="form-check-label">
-                Purchased
-              </Label>
-            </div>
           </FormGroup>
         </Form>
       </ModalBody>
@@ -186,4 +156,4 @@ const ItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
   );
 };
 
-export default ItemModal;
+export default PantryItemModal;

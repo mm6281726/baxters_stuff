@@ -1,76 +1,129 @@
-import React, { Component } from "react";
-import { Button, Card, ListGroup, ListGroupItem, Row, Col } from 'reactstrap';
-
-import Modal from "../components/ListModal"
-
+import React, { useState, useEffect } from "react";
+import { Button, Card, ListGroup, Row, Col, Spinner, Alert } from 'reactstrap';
 import axios from "axios";
 
-class Ingredients extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            ingredients: [],
-            modal: false,
-            activeItem: {
-                name: "",
-                description: "",
-                categories: [],
-            },
-        };
-    }
+import IngredientModal from "../components/IngredientModal";
+import IngredientItem from "../components/IngredientItem";
+import CategoryGroup from "../components/CategoryGroup";
+import IngredientSearch from "../components/IngredientSearch";
+import IngredientActions from "../components/IngredientActions";
+import "./List.css";
 
-    componentDidMount() {
-        this.refreshList();
-    }
+const Ingredients = () => {
+    const [ingredients, setIngredients] = useState([]);
+    const [filteredIngredients, setFilteredIngredients] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [modal, setModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [viewMode, setViewMode] = useState("category");
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [activeItem, setActiveItem] = useState({
+        name: "",
+        description: "",
+        categories: [],
+    });
 
-    refreshList = () => {
-        axios
-            .get("/api/ingredients/")
-            .then((res) => this.setState({ ingredients: res.data }))
-            .catch((err) => console.log(err));
-    };
+    // Fetch ingredients and categories on component mount
+    useEffect(() => {
+        refreshList();
+        fetchCategories();
+    }, []);
 
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-    };
+    // Filter ingredients when search term or selected category changes
+    useEffect(() => {
+        filterIngredients();
+    }, [ingredients, searchTerm, selectedCategory]);
 
-    handleSubmit = (item, categoryIds) => {
-        this.toggle();
-
-        if (item.id) {
-            console.log(item)
-            item.categories = categoryIds
-            console.log(item)
-            axios
-                .put(`/api/ingredients/${item.id}/`, item)
-                .then((res) => this.refreshList());
-        } else {
-            axios
-                .post("/api/ingredients/", item)
-                .then((res) => this.refreshList());
+    const refreshList = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get("/api/ingredients/");
+            setIngredients(response.data);
+            setError("");
+        } catch (err) {
+            console.error("Error fetching ingredients:", err);
+            setError("Failed to load ingredients. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    handleDelete = (item) => {
-        axios
-            .delete(`/api/ingredients/${item.id}/`)
-            .then((res) => this.refreshList());
+    const fetchCategories = async () => {
+        try {
+            const response = await axios.get("/api/ingredients/categories/");
+            setCategories(response.data);
+        } catch (err) {
+            console.error("Error fetching categories:", err);
+        }
     };
 
-    createItem = () => {
+    const filterIngredients = () => {
+        let filtered = [...ingredients];
+
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(ingredient =>
+                ingredient.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Filter by selected category
+        if (selectedCategory) {
+            filtered = filtered.filter(ingredient =>
+                ingredient.categories.some(category => category.name === selectedCategory)
+            );
+        }
+
+        setFilteredIngredients(filtered);
+    };
+
+    const toggle = () => {
+        setModal(!modal);
+    };
+
+    const handleSubmit = async (item, categoryIds) => {
+        toggle();
+        try {
+            if (item.id) {
+                item.categories = categoryIds;
+                await axios.put(`/api/ingredients/${item.id}/`, item);
+            } else {
+                await axios.post("/api/ingredients/", item);
+            }
+            refreshList();
+            fetchCategories(); // Refresh categories in case new ones were added
+        } catch (err) {
+            console.error("Error saving ingredient:", err);
+            setError("Failed to save ingredient. Please try again.");
+        }
+    };
+
+    const handleDelete = async (item) => {
+        try {
+            await axios.delete(`/api/ingredients/${item.id}/`);
+            refreshList();
+        } catch (err) {
+            console.error("Error deleting ingredient:", err);
+            setError("Failed to delete ingredient. Please try again.");
+        }
+    };
+
+    const createItem = () => {
         const item = { name: "", description: "", categories: [] };
-
-        this.setState({ activeItem: item, modal: !this.state.modal });
+        setActiveItem(item);
+        setModal(true);
     };
 
-    editItem = (item) => {
-        this.setState({ activeItem: item, modal: !this.state.modal });
+    const editItem = (item) => {
+        setActiveItem(item);
+        setModal(true);
     };
 
     // Group ingredients by category
-    groupIngredientsByCategory = () => {
-        const ingredients = this.state.ingredients;
-        if (!ingredients || ingredients.length === 0) {
+    const groupIngredientsByCategory = () => {
+        if (!filteredIngredients || filteredIngredients.length === 0) {
             return {};
         }
 
@@ -81,7 +134,7 @@ class Ingredients extends Component {
         categoryMap["Uncategorized"] = [];
 
         // Group ingredients by category
-        ingredients.forEach(ingredient => {
+        filteredIngredients.forEach(ingredient => {
             if (ingredient.categories.length === 0) {
                 categoryMap["Uncategorized"].push(ingredient);
             } else {
@@ -102,98 +155,124 @@ class Ingredients extends Component {
         return categoryMap;
     };
 
-    renderIngredientItem = (item) => {
-        return (
-            <ListGroupItem
-                key={item.id}
-                className="d-flex justify-content-between align-items-center"
-            >
-                <span
-                    className="ingredients-title"
-                    title={item.description}
-                >
-                    {item.name}
-                </span>
-                <span>
-                    <Button
-                        color="secondary"
-                        onClick={() => this.editItem(item)}
-                    >
-                        Edit
-                    </Button>
-                    {" "}
-                    <Button
-                        color="danger"
-                        onClick={() => this.handleDelete(item)}
-                    >
-                        Delete
-                    </Button>
-                </span>
-            </ListGroupItem>
-        );
-    };
-
-    renderItems = () => {
-        const groupedIngredients = this.groupIngredientsByCategory();
-        const categoryNames = Object.keys(groupedIngredients).sort();
-
-        if (categoryNames.length === 0) {
-            return <div className="text-center">No ingredients found</div>;
+    const renderIngredients = () => {
+        if (loading) {
+            return (
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                </div>
+            );
         }
 
-        return categoryNames.map(categoryName => {
-            // Sort ingredients alphabetically within each category
-            const sortedIngredients = [...groupedIngredients[categoryName]].sort((a, b) =>
+        if (!filteredIngredients || filteredIngredients.length === 0) {
+            return (
+                <div className="empty-state">
+                    <div className="empty-state-icon">🌿</div>
+                    <h4>No ingredients found</h4>
+                    <p>Add some ingredients or adjust your search filters.</p>
+                    <Button color="success" onClick={createItem}>Add Ingredient</Button>
+                </div>
+            );
+        }
+
+        if (viewMode === "category") {
+            const groupedIngredients = groupIngredientsByCategory();
+            const categoryNames = Object.keys(groupedIngredients).sort();
+
+            if (categoryNames.length === 0) {
+                return (
+                    <div className="empty-state">
+                        <div className="empty-state-icon">🔍</div>
+                        <h4>No matching ingredients</h4>
+                        <p>Try adjusting your search filters.</p>
+                    </div>
+                );
+            }
+
+            return categoryNames.map(categoryName => (
+                <CategoryGroup
+                    key={categoryName}
+                    categoryName={categoryName}
+                    ingredients={groupedIngredients[categoryName].sort((a, b) =>
+                        a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+                    )}
+                    onEdit={editItem}
+                    onDelete={handleDelete}
+                />
+            ));
+        } else {
+            // Alphabetical view
+            const sortedIngredients = [...filteredIngredients].sort((a, b) =>
                 a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
             );
 
             return (
-                <div key={categoryName} className="mb-4">
-                    <h5 className="category-header bg-light p-2 rounded">{categoryName}</h5>
-                    <ListGroup className="mb-3">
-                        {sortedIngredients.map(item => this.renderIngredientItem(item))}
-                    </ListGroup>
-                </div>
+                <ListGroup className="mb-3">
+                    {sortedIngredients.map(ingredient => (
+                        <IngredientItem
+                            key={ingredient.id}
+                            ingredient={ingredient}
+                            onEdit={editItem}
+                            onDelete={handleDelete}
+                        />
+                    ))}
+                </ListGroup>
             );
-        });
+        }
     };
 
-    render(){
+    if (loading && ingredients.length === 0) {
         return (
-            <div>
-                <h1 className="text-uppercase text-center my-4">Ingredients</h1>
-                <Row>
-                    <Col
-                        md="6"
-                        sm="10"
-                        className="mx-auto p-0"
-                    >
-                        <Card className="p-3">
-                            <div className="mb-4">
-                                <Button
-                                    color="primary"
-                                    onClick={this.createItem}
-                                >
-                                    Add Ingredient
-                                </Button>
-                            </div>
-                            <ListGroup flush className="border-top-0">
-                                {this.renderItems()}
-                            </ListGroup>
-                        </Card>
-                    </Col>
-                </Row>
-
-                {this.state.modal ? (
-                    <Modal
-                        activeItem={this.state.activeItem}
-                        toggle={this.toggle}
-                        onSave={this.handleSubmit}
-                    />
-                ) : null}
+            <div className="text-center mt-5">
+                <Spinner color="success" />
+                <p className="mt-2">Loading ingredients...</p>
             </div>
         );
     }
-}
 
-export default Ingredients
+    return (
+        <div className="ingredients-container">
+            <h1 className="text-center my-4">Ingredients</h1>
+
+            {error && <Alert color="danger" className="mx-auto" style={{ maxWidth: '800px' }}>{error}</Alert>}
+
+            <Row>
+                <Col
+                    lg="8"
+                    md="10"
+                    sm="12"
+                    className="mx-auto p-0"
+                >
+                    <Card className="p-4 shadow-sm">
+                        <IngredientSearch
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                            viewMode={viewMode}
+                            onViewModeChange={setViewMode}
+                            selectedCategory={selectedCategory}
+                            categories={categories}
+                            onCategoryChange={setSelectedCategory}
+                        />
+
+                        <IngredientActions
+                            onAddIngredient={createItem}
+                        />
+
+                        {renderIngredients()}
+                    </Card>
+                </Col>
+            </Row>
+
+            {modal && (
+                <IngredientModal
+                    activeItem={activeItem}
+                    toggle={toggle}
+                    onSave={handleSubmit}
+                    onDelete={handleDelete}
+                />
+            )}
+        </div>
+    );
+};
+
+export default Ingredients;

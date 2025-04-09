@@ -16,3 +16,21 @@
 .navbar .nav-link:hover {
     color: #007bff !important;
 }
+
+/* Styling for the NavbarBrand replacement */
+.navbar-brand {
+    display: inline-block;
+    padding-top: 0.3125rem;
+    padding-bottom: 0.3125rem;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+    line-height: inherit;
+    white-space: nowrap;
+    color: rgba(0, 0, 0, 0.9);
+    text-decoration: none;
+}
+
+.navbar-brand:hover {
+    color: rgba(0, 0, 0, 0.9);
+    text-decoration: none;
+}

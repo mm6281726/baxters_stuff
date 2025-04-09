@@ -1,157 +1,191 @@
-import React, { Component } from "react";
-import { Button, Card, ListGroup, ListGroupItem, Row, Col } from 'reactstrap';
-
-import Modal from "../components/ListModal"
-
+import React, { useState, useEffect } from "react";
+import { Button, Card, ListGroup, Row, Col, Spinner, Alert } from 'reactstrap';
 import axios from "axios";
 
-class Categories extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            categoryList: [],
-            modal: false,
-            activeItem: {
-                name: "",
-                description: "",
-            },
-        };
-    }
+import CategoryModal from "../components/CategoryModal";
+import CategoryItem from "../components/CategoryItem";
+import CategorySearch from "../components/CategorySearch";
+import CategoryActions from "../components/CategoryActions";
+import "./List.css";
 
-    componentDidMount() {
-        this.refreshList();
-    }
+const Categories = () => {
+    const [categories, setCategories] = useState([]);
+    const [filteredCategories, setFilteredCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [modal, setModal] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [activeItem, setActiveItem] = useState({
+        name: "",
+        description: "",
+    });
 
-    refreshList = () => {
-        axios
-            .get("/api/ingredients/categories/")
-            .then(
-                (res) => this.setState({ categoryList: res.data }),
-            )
-            .catch((err) => console.log(err));
-    };
+    // Fetch categories on component mount
+    useEffect(() => {
+        refreshList();
+    }, []);
 
-    toggle = () => {
-        this.setState({ modal: !this.state.modal });
-    };
+    // Filter categories when search term changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        filterCategories();
+    }, [categories, searchTerm]);
 
-    handleSubmit = (item) => {
-        this.toggle();
-        console.log('Submitting category:', item);
-
-        if (item.id) {
-            axios
-                .put(`/api/ingredients/categories/${item.id}/`, item)
-                .then((res) => {
-                    console.log('Category updated successfully:', res.data);
-                    this.refreshList();
-                })
-                .catch(err => {
-                    console.error('Error updating category:', err.response ? err.response.data : err);
-                });
-        } else {
-            axios
-                .post("/api/ingredients/categories/", item)
-                .then((res) => {
-                    console.log('Category created successfully:', res.data);
-                    this.refreshList();
-                })
-                .catch(err => {
-                    console.error('Error creating category:', err.response ? err.response.data : err);
-                });
+    const refreshList = async () => {
+        try {
+            setLoading(true);
+            const response = await axios.get("/api/ingredients/categories/");
+            setCategories(response.data);
+            setError("");
+        } catch (err) {
+            console.error("Error fetching categories:", err);
+            setError("Failed to load categories. Please try again.");
+        } finally {
+            setLoading(false);
         }
     };
 
-    handleDelete = (item) => {
-        axios
-            .delete(`/api/ingredients/categories/${item.id}/`)
-            .then((res) => this.refreshList());
-    };
+    const filterCategories = () => {
+        let filtered = [...categories];
 
-    createItem = () => {
-        const item = { name: "", description: "", };
-
-        this.setState({ activeItem: item, modal: !this.state.modal });
-    };
-
-    editItem = (item) => {
-        this.setState({ activeItem: item, modal: !this.state.modal });
-    };
-
-    renderItems = () => {
-        const categoryList = this.state.categoryList;
-        if(!categoryList){
-            return;
+        // Filter by search term
+        if (searchTerm) {
+            filtered = filtered.filter(category =>
+                category.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
 
-        return categoryList.map((item) => (
-            <ListGroupItem
-                key={item.id}
-                className="d-flex justify-content-between align-items-center"
-            >
-                <span
-                    className={`
-                        categories-title
-                    `}
-                    title={item.description}
-                >
-                    {item.name}
-                </span>
-                <span>
-                    <Button
-                        color="secondary"
-                        onClick={() => this.editItem(item)}
-                    >
-                        Edit
-                    </Button>
-                    {" "}
-                    <Button
-                        color="danger"
-                        onClick={() => this.handleDelete(item)}
-                    >
-                        Delete
-                    </Button>
-                </span>
-            </ListGroupItem>
-        ));
+        setFilteredCategories(filtered);
     };
 
-    render(){
+    const toggle = () => {
+        setModal(!modal);
+    };
+
+    const handleSubmit = async (item) => {
+        toggle();
+        try {
+            if (item.id) {
+                console.log('Updating category:', item);
+                await axios.put(`/api/ingredients/categories/${item.id}/`, item);
+            } else {
+                console.log('Creating new category:', item);
+                await axios.post("/api/ingredients/categories/", item);
+            }
+            refreshList();
+        } catch (err) {
+            console.error("Error saving category:", err);
+            setError("Failed to save category. Please try again.");
+        }
+    };
+
+    const handleDelete = async (item) => {
+        try {
+            await axios.delete(`/api/ingredients/categories/${item.id}/`);
+            refreshList();
+        } catch (err) {
+            console.error("Error deleting category:", err);
+            setError("Failed to delete category. Please try again.");
+        }
+    };
+
+    const createItem = () => {
+        const item = { name: "", description: "" };
+        setActiveItem(item);
+        setModal(true);
+    };
+
+    const editItem = (item) => {
+        setActiveItem(item);
+        setModal(true);
+    };
+
+    const renderCategories = () => {
+        if (loading) {
+            return (
+                <div className="loading-container">
+                    <div className="loading-spinner"></div>
+                </div>
+            );
+        }
+
+        if (!filteredCategories || filteredCategories.length === 0) {
+            return (
+                <div className="empty-state">
+                    <div className="empty-state-icon">📁</div>
+                    <h4>No categories found</h4>
+                    <p>Add some categories or adjust your search filters.</p>
+                    <Button color="primary" onClick={createItem}>Add Category</Button>
+                </div>
+            );
+        }
+
+        // Sort categories alphabetically
+        const sortedCategories = [...filteredCategories].sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+        );
+
         return (
-            <div>
-                <h1 className="text-uppercase text-center my-4">Categories</h1>
-                <Row>
-                    <Col
-                        md="6"
-                        sm="10"
-                        className="mx-auto p-0"
-                    >
-                        <Card className="p-3">
-                            <div className="mb-4">
-                                <Button
-                                    color="primary"
-                                    onClick={this.createItem}
-                                >
-                                    Add Category
-                                </Button>
-                            </div>
-                            <ListGroup flush className="border-top-0">
-                                {this.renderItems()}
-                            </ListGroup>
-                        </Card>
-                    </Col>
-                </Row>
-
-                {this.state.modal ? (
-                    <Modal
-                        activeItem={this.state.activeItem}
-                        toggle={this.toggle}
-                        onSave={this.handleSubmit}
+            <ListGroup className="mb-3">
+                {sortedCategories.map(category => (
+                    <CategoryItem
+                        key={category.id}
+                        category={category}
+                        onEdit={editItem}
+                        onDelete={handleDelete}
                     />
-                ) : null}
+                ))}
+            </ListGroup>
+        );
+    };
+
+    if (loading && categories.length === 0) {
+        return (
+            <div className="text-center mt-5">
+                <Spinner color="primary" />
+                <p className="mt-2">Loading categories...</p>
             </div>
         );
     }
-}
 
-export default Categories
+    return (
+        <div className="categories-container">
+            <h1 className="text-center my-4">Categories</h1>
+
+            {error && <Alert color="danger" className="mx-auto" style={{ maxWidth: '800px' }}>{error}</Alert>}
+
+            <Row>
+                <Col
+                    lg="8"
+                    md="10"
+                    sm="12"
+                    className="mx-auto p-0"
+                >
+                    <Card className="p-4 shadow-sm">
+                        <CategorySearch
+                            searchTerm={searchTerm}
+                            onSearchChange={setSearchTerm}
+                        />
+
+                        <CategoryActions
+                            onAddCategory={createItem}
+                        />
+
+                        {renderCategories()}
+                    </Card>
+                </Col>
+            </Row>
+
+            {modal && (
+                <CategoryModal
+                    activeItem={activeItem}
+                    toggle={toggle}
+                    onSave={handleSubmit}
+                    onDelete={handleDelete}
+                />
+            )}
+        </div>
+    );
+};
+
+export default Categories;
