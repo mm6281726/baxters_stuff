@@ -197,6 +197,32 @@ const GroceryListItems = () => {
         navigate('/');
     };
 
+    const completeList = async () => {
+        try {
+            setLoading(true);
+            // First mark all items as purchased
+            await markAllPurchased();
+
+            // Then add the grocery list to the pantry
+            await axios.post(`/api/pantry/add-grocery-list/${groceryListId}/`);
+
+            // Refresh the grocery list to show it as completed
+            await fetchGroceryList();
+
+            // Show success message
+            setError("");
+            alert("Grocery list completed and items added to pantry!");
+
+            // Navigate back to the grocery lists page
+            navigate('/');
+        } catch (err) {
+            console.error("Error completing grocery list:", err);
+            setError("Failed to complete grocery list. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const deleteList = async () => {
         try {
             await axios.delete(`/api/grocerylist/${groceryListId}/`);
@@ -363,6 +389,7 @@ const GroceryListItems = () => {
                             onMarkAllPurchased={markAllPurchased}
                             onClearPurchased={clearPurchased}
                             onDeleteList={confirmDeleteList}
+                            onCompleteList={completeList}
                         />
 
                         {renderItems()}

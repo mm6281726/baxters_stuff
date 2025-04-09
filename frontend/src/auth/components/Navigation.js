@@ -67,6 +67,17 @@ export function Navigation() {
                             </NavLink>
                         </NavItem>
                     ) : null}
+                    {isAuth ? (
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/pantry"
+                                className={isActive('/pantry') ? 'active' : ''}
+                            >
+                                Pantry
+                            </NavLink>
+                        </NavItem>
+                    ) : null}
                 </Nav>
                 <Nav navbar className="ms-auto">
                     {isAuth ? null : (
