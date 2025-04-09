@@ -12,6 +12,8 @@ import GroceryListItems from "./groceryList/pages/Items";
 import Ingredients from "./ingredients/pages/List";
 import Categories from "./categories/pages/List";
 import PantryItems from "./pantry/pages/List";
+import Recipes from "./recipe/pages/List";
+import RecipeDetail from "./recipe/pages/Detail";
 
 class App extends Component {
   constructor(props) {
@@ -42,6 +44,12 @@ class App extends Component {
               </Route>
               <Route element={<PrivateRoute />}>
                 <Route path="/pantry" element={<PantryItems />} />
+              </Route>
+              <Route element={<PrivateRoute />}>
+                <Route path="/recipes" element={<Recipes />} />
+              </Route>
+              <Route element={<PrivateRoute />}>
+                <Route path="/recipes/:id" element={<RecipeDetail />} />
               </Route>
             </Routes>
             </AuthProvider>
