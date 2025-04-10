@@ -26,6 +26,10 @@ export function Navigation() {
         if (path === '/' && location.pathname.startsWith('/grocerylist/')) {
             return true;
         }
+        // For recipe detail pages
+        if (path === '/recipes' && location.pathname.startsWith('/recipes/')) {
+            return true;
+        }
         return location.pathname === path;
     };
 
@@ -41,7 +45,29 @@ export function Navigation() {
                                 to="/"
                                 className={isActive('/') ? 'active' : ''}
                             >
-                                Grocery List
+                                Grocery Lists
+                            </NavLink>
+                        </NavItem>
+                    ) : null}
+                    {isAuth ? (
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/pantry"
+                                className={isActive('/pantry') ? 'active' : ''}
+                            >
+                                Pantry
+                            </NavLink>
+                        </NavItem>
+                    ) : null}
+                    {isAuth ? (
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/recipes"
+                                className={isActive('/recipes') ? 'active' : ''}
+                            >
+                                Recipes
                             </NavLink>
                         </NavItem>
                     ) : null}
@@ -64,17 +90,6 @@ export function Navigation() {
                                 className={isActive('/categories') ? 'active' : ''}
                             >
                                 Categories
-                            </NavLink>
-                        </NavItem>
-                    ) : null}
-                    {isAuth ? (
-                        <NavItem>
-                            <NavLink
-                                tag={Link}
-                                to="/pantry"
-                                className={isActive('/pantry') ? 'active' : ''}
-                            >
-                                Pantry
                             </NavLink>
                         </NavItem>
                     ) : null}

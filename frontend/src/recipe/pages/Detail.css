@@ -1,0 +1,172 @@
+/* Recipe Detail Page Styles */
+
+/* Action buttons */
+.recipe-detail-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.recipe-detail-action-buttons .btn {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Category styling */
+.category-header {
+  background-color: #f8f9fa;
+  border-left: 4px solid #fd7e14;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-header:hover {
+  background-color: #e9ecef;
+}
+
+.category-header .toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+.category-header.collapsed .toggle-icon {
+  transform: rotate(-90deg);
+}
+
+/* Item styling */
+.recipe-ingredient {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+
+.recipe-ingredient:hover {
+  background-color: #f8f9fa;
+  border-left-color: #fd7e14;
+  box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+.recipe-ingredient-title {
+  margin-left: 10px;
+  transition: all 0.2s ease;
+}
+
+.recipe-ingredient-actions {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+.recipe-ingredient:hover .recipe-ingredient-actions {
+  opacity: 1;
+}
+
+/* Step styling */
+.recipe-step {
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.recipe-step:hover {
+  background-color: #f8f9fa;
+  border-left-color: #fd7e14;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+}
+
+.recipe-step-number {
+  font-weight: bold;
+  color: #fd7e14;
+  margin-right: 10px;
+}
+
+.recipe-step-description {
+  white-space: pre-line;
+}
+
+.recipe-step-actions {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+}
+
+.recipe-step:hover .recipe-step-actions {
+  opacity: 1;
+}
+
+/* Section styling */
+.recipe-section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  border-bottom: 2px solid #fd7e14;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: #495057;
+}
+
+/* Recipe meta information */
+.recipe-meta {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+.recipe-meta-item {
+  text-align: center;
+}
+
+.recipe-meta-item h6 {
+  color: #6c757d;
+  margin-bottom: 5px;
+}
+
+.recipe-meta-item p {
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+/* Recipe description */
+.recipe-description {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  border-left: 4px solid #fd7e14;
+}
+
+.recipe-description h5 {
+  color: #495057;
+  margin-bottom: 10px;
+}
+
+.recipe-description p {
+  margin-bottom: 0;
+  white-space: pre-line;
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 15px;
+  color: #dee2e6;
+}

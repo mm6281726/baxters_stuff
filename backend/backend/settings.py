@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'grocery_list',
     'ingredient',
     'pantry',
+    'recipe',
 ]
 
 MIDDLEWARE = [
