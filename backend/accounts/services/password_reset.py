@@ -5,6 +5,8 @@ from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.core.mail import send_mail
 from django.conf import settings
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 from rest_framework import serializers
 
 from ..serializers.password_reset import PasswordResetRequestSerializer, PasswordResetConfirmSerializer
@@ -21,50 +23,48 @@ class PasswordResetService:
         serializer = PasswordResetRequestSerializer(data=validated_data)
         if not serializer.is_valid():
             raise serializers.ValidationError(serializer.errors)
-        
+
         email = serializer.validated_data['email']
         user = User.objects.get(email=email)
-        
+
         # Generate token and UID
         uid = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
-        
-        # Create reset URL (frontend URL)
-        reset_url = f"http://localhost:3000/reset-password/{uid}/{token}"
-        
+
+        # Get frontend URL from settings or use default
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+        reset_url = f"{frontend_url}/reset-password/{uid}/{token}"
+
         # Send email
         subject = "Password Reset for Baxter's Stuff"
-        message = f"""
-        Hello {user.username},
-        
-        You requested a password reset for your Baxter's Stuff account.
-        
-        Please click the link below to reset your password:
-        
-        {reset_url}
-        
-        If you didn't request this, you can safely ignore this email.
-        
-        This link will expire in 24 hours.
-        
-        Regards,
-        Baxter's Stuff Team
-        """
-        
+
+        # Context for email template
+        context = {
+            'username': user.username,
+            'reset_url': reset_url,
+            'valid_hours': 24
+        }
+
+        # Create HTML message
+        html_message = render_to_string('password_reset_email.html', context)
+        # Create plain text message
+        plain_message = strip_tags(html_message)
+
         try:
             send_mail(
                 subject,
-                message,
-                settings.EMAIL_HOST_USER if hasattr(settings, 'EMAIL_HOST_USER') else 'noreply@baxtersstuff.com',
+                plain_message,
+                settings.DEFAULT_FROM_EMAIL,
                 [email],
                 fail_silently=False,
+                html_message=html_message
             )
             logger.info(f"Password reset email sent to {email}")
             return {"detail": "Password reset email has been sent."}
         except Exception as e:
             logger.error(f"Failed to send password reset email: {str(e)}")
             raise serializers.ValidationError({"email": "Failed to send password reset email."})
-    
+
     @staticmethod
     def confirm_password_reset(validated_data):
         """
@@ -73,9 +73,9 @@ class PasswordResetService:
         serializer = PasswordResetConfirmSerializer(data=validated_data)
         if not serializer.is_valid():
             raise serializers.ValidationError(serializer.errors)
-        
+
         # Save the new password
         user = serializer.save()
         logger.info(f"Password reset successful for user {user.username}")
-        
+
         return {"detail": "Password has been reset successfully."}

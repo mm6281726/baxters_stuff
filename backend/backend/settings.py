@@ -85,7 +85,9 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'accounts/templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -179,16 +181,17 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
-# For development, we'll use the console backend
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# Use environment variables for email configuration
+EMAIL_BACKEND = env('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = env('EMAIL_HOST', default='')
+EMAIL_PORT = env.int('EMAIL_PORT', default=587)
+EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
+EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@baxtersstuff.com')
 
-# For production, uncomment and configure these settings
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = env('EMAIL_HOST', default='')
-# EMAIL_PORT = env.int('EMAIL_PORT', default=587)
-# EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
-# EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
-# EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+# Frontend URL for password reset links
+FRONTEND_URL = env('FRONTEND_URL', default='http://localhost:3000')
 
 # Password reset settings
 PASSWORD_RESET_TIMEOUT = 86400  # 24 hours in seconds
