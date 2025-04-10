@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, ListGroup, Row, Col, Spinner, Alert } from 'reactstrap';
+import { Button, Card, ListGroup, Row, Col, Spinner, Alert } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import './List.css';
@@ -80,7 +80,7 @@ const Recipes = () => {
 
     const handleSubmit = async (item) => {
         toggle();
-        
+
         try {
             if (item.id) {
                 // Update existing recipe
@@ -115,6 +115,9 @@ const Recipes = () => {
                     <div className="empty-state-icon">📝</div>
                     <h4>No recipes found</h4>
                     <p>Add a new recipe to get started.</p>
+                    <Button color="primary" onClick={createItem} className="d-flex align-items-center mx-auto">
+                        <span className="me-1">+</span> Add Recipe
+                    </Button>
                 </div>
             );
         }

@@ -6,8 +6,8 @@ const ItemActions = ({ onAddItem, onMarkAllPurchased, onClearPurchased, onDelete
   return (
     <div className="d-flex justify-content-between align-items-center mb-3">
       <div className="batch-actions">
-        <Button color="primary" onClick={onAddItem} className="me-2">
-          Add Item
+        <Button color="primary" onClick={onAddItem} className="me-2 d-flex align-items-center">
+          <span className="me-1">+</span> Add Item
         </Button>
         <Button color="success" onClick={onMarkAllPurchased} className="me-2">
           Mark All Purchased

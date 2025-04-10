@@ -19,27 +19,27 @@ class JwtMiddleware:
             return response
         except exceptions.AuthenticationFailed as exception:
             return JsonResponse({ 'message': exception.detail, }, status=exception.status_code)
-        
+
     def __allow_request(request):
         path = request.path
         return path.startswith(JwtMiddleware.allowPaths)
-    
+
     def __create_response(self, request):
         user = JwtMiddleware.__authenticate(request)
         if user:
             request.user = user
         else:
             raise exceptions.AuthenticationFailed("Could not verify token.")
-        
+
         return self.get_response(request)
 
     def __authenticate(request):
         access = JwtMiddleware.__get_token(request)
         try:
             user = LoginService.get_authenticated_user(access)
-        except Exception as exception:
+        except Exception:
             raise exceptions.AuthenticationFailed("Token is expired.")
-        
+
         return user
 
     def __get_token(request):
@@ -47,9 +47,9 @@ class JwtMiddleware:
         token = header[len(JwtMiddleware.PREFIX):]
         if token is None:
                 raise exceptions.AuthenticationFailed("No token.")
-        
+
         return token
-    
+
     def __get_header(request):
         header = request.META.get('HTTP_AUTHORIZATION')
         if not header or not header.startswith(JwtMiddleware.PREFIX):

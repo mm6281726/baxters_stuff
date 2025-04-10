@@ -6,7 +6,7 @@ const PantryActions = ({ onAddItem }) => {
   return (
     <div className="d-flex justify-content-between mb-4">
       <Button
-        color="success"
+        color="primary"
         onClick={onAddItem}
         className="d-flex align-items-center"
       >

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Nav, Navbar, NavbarBrand, NavItem, NavLink } from 'reactstrap';
+import { Nav, Navbar, NavItem, NavLink } from 'reactstrap';
+import { FaCog } from 'react-icons/fa';
 import { useLocation, Link } from 'react-router-dom';
 import './Navigation.css';
 
@@ -106,6 +107,17 @@ export function Navigation() {
                             </NavLink>
                         </NavItem>
                     )}
+                    {isAuth ? (
+                        <NavItem>
+                            <NavLink
+                                tag={Link}
+                                to="/settings"
+                                className={`settings-link ${isActive('/settings') ? 'active' : ''}`}
+                            >
+                                <FaCog className="me-1" />
+                            </NavLink>
+                        </NavItem>
+                    ) : null}
                     <NavItem>
                         {isAuth ? (
                             <NavLink

@@ -25,17 +25,6 @@ const PantryItem = ({ item, onEdit, onDelete }) => {
       </div>
       <div className="pantry-item-actions">
         <Button
-          color="secondary"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click handler from firing
-            onEdit(item);
-          }}
-          size="sm"
-          className="me-2"
-        >
-          Edit
-        </Button>
-        <Button
           color="danger"
           onClick={(e) => {
             e.stopPropagation(); // Prevent row click handler from firing
@@ -43,7 +32,7 @@ const PantryItem = ({ item, onEdit, onDelete }) => {
           }}
           size="sm"
         >
-          Delete
+          Remove
         </Button>
       </div>
     </ListGroupItem>

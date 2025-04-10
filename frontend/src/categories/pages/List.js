@@ -115,7 +115,9 @@ const Categories = () => {
                     <div className="empty-state-icon">📁</div>
                     <h4>No categories found</h4>
                     <p>Add some categories or adjust your search filters.</p>
-                    <Button color="primary" onClick={createItem}>Add Category</Button>
+                    <Button color="primary" onClick={createItem} className="d-flex align-items-center mx-auto">
+                        <span className="me-1">+</span> Add Category
+                    </Button>
                 </div>
             );
         }

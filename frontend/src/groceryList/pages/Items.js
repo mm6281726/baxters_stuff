@@ -289,7 +289,9 @@ const GroceryListItems = () => {
                     <div className="empty-state-icon">📝</div>
                     <h4>No items found</h4>
                     <p>Add some items to your grocery list or adjust your search filters.</p>
-                    <Button color="primary" onClick={createItem}>Add Item</Button>
+                    <Button color="primary" onClick={createItem} className="d-flex align-items-center mx-auto">
+                        <span className="me-1">+</span> Add Item
+                    </Button>
                 </div>
             );
         }
