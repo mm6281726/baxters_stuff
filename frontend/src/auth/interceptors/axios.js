@@ -6,7 +6,11 @@ const cookies = new Cookies();
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 axios.defaults.xsrfCookieName = 'csrftoken'
 
-axios.defaults.headers.common['Authorization'] = `JWT ${localStorage.getItem('access')}`;
+// Set the Authorization header if access token exists
+const accessToken = localStorage.getItem('access');
+if (accessToken) {
+    axios.defaults.headers.common['Authorization'] = `JWT ${accessToken}`;
+}
 
 let refresh = false;
 axios.interceptors.response.use(resp => resp, async error => {

@@ -8,16 +8,16 @@ const RecipeDetailActions = ({ onAddItem, onAddStep, onDeleteRecipe, onAddToGroc
       <Button
         color="primary"
         onClick={onAddItem}
-        className="me-2"
+        className="me-2 d-flex align-items-center"
       >
-        Add Ingredient
+        <span className="me-1">+</span> Add Ingredient
       </Button>
       <Button
         color="secondary"
         onClick={onAddStep}
-        className="me-2"
+        className="me-2 d-flex align-items-center"
       >
-        Add Step
+        <span className="me-1">+</span> Add Step
       </Button>
       <Button
         color="success"

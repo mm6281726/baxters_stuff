@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Row, Col, Spinner, Alert } from 'reactstrap';
+import { Button, Card, Row, Col, Spinner, Alert } from 'reactstrap';
 import axios from "axios";
 
 import PantryItemModal from "../components/PantryItemModal";
@@ -84,7 +84,7 @@ const PantryItems = () => {
 
     const handleSubmit = async (item) => {
         toggle();
-        
+
         try {
             if (item.id) {
                 // Update existing item
@@ -164,6 +164,9 @@ const PantryItems = () => {
                     <div className="empty-state-icon">🍽️</div>
                     <h4>No pantry items found</h4>
                     <p>Add items to your pantry to get started.</p>
+                    <Button color="primary" onClick={createItem} className="d-flex align-items-center mx-auto">
+                        <span className="me-1">+</span> Add Pantry Item
+                    </Button>
                 </div>
             );
         }

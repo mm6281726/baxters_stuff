@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Card, Col, Form, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Link } from 'react-router-dom';
 
 import { useAuth } from "../hooks/AuthProvider";
 
@@ -40,7 +41,7 @@ export const Login = () => {
                         <h3>Login</h3>
                         <Form onSubmit={handleSubmitEvent} className="mt-3">
                             <FormGroup floating>
-                                <Input 
+                                <Input
                                     name='username'
                                     placeholder="Username"
                                     type='text'
@@ -50,7 +51,7 @@ export const Login = () => {
                                 <Label for="username">Username</Label>
                             </FormGroup>
                             <FormGroup floating>
-                                <Input 
+                                <Input
                                     name='password'
                                     type="password"
                                     placeholder="Password"
@@ -62,6 +63,9 @@ export const Login = () => {
                             <Button color="primary">
                                 Submit
                             </Button>
+                            <div className="mt-3">
+                                <Link to="/forgot-password">Forgot Password?</Link>
+                            </div>
                         </Form>
                     </Card>
                 </Col>

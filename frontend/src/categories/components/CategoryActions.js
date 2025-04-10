@@ -4,9 +4,13 @@ import '../pages/List.css';
 
 const CategoryActions = ({ onAddCategory }) => {
   return (
-    <div className="batch-actions">
-      <Button color="primary" onClick={onAddCategory}>
-        Add Category
+    <div className="d-flex justify-content-between mb-4">
+      <Button
+        color="primary"
+        onClick={onAddCategory}
+        className="d-flex align-items-center"
+      >
+        <span className="me-1">+</span> Add Category
       </Button>
     </div>
   );

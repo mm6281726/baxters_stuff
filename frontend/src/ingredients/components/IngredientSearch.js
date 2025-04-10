@@ -1,14 +1,14 @@
 import React from 'react';
-import { Input, FormGroup, Label, Row, Col, Button } from 'reactstrap';
+import { Input, FormGroup, Label, Row, Col, ButtonGroup, Button } from 'reactstrap';
 import '../pages/List.css';
 
 const IngredientSearch = ({ searchTerm, onSearchChange, viewMode, onViewModeChange, selectedCategory, categories, onCategoryChange }) => {
   return (
-    <div className="search-filter-bar">
+    <div className="search-filter-bar mb-4">
       <Row>
         <Col md={6}>
           <FormGroup>
-            <Label for="ingredient-search">Search Ingredients</Label>
+            <Label for="ingredient-search" className="fw-bold">Search Ingredients</Label>
             <Input
               type="text"
               id="ingredient-search"
@@ -20,29 +20,30 @@ const IngredientSearch = ({ searchTerm, onSearchChange, viewMode, onViewModeChan
         </Col>
         <Col md={3}>
           <FormGroup>
-            <Label for="view-mode">View Mode</Label>
-            <div className="d-flex">
-              <Button
-                color={viewMode === 'category' ? 'success' : 'outline-success'}
-                onClick={() => onViewModeChange('category')}
-                className="me-2"
-                size="sm"
-              >
-                By Category
-              </Button>
-              <Button
-                color={viewMode === 'alphabetical' ? 'success' : 'outline-success'}
-                onClick={() => onViewModeChange('alphabetical')}
-                size="sm"
-              >
-                Alphabetical
-              </Button>
+            <Label className="fw-bold">View Mode</Label>
+            <div>
+              <ButtonGroup>
+                <Button
+                  color={viewMode === 'category' ? 'primary' : 'secondary'}
+                  onClick={() => onViewModeChange('category')}
+                  outline={viewMode !== 'category'}
+                >
+                  By Category
+                </Button>
+                <Button
+                  color={viewMode === 'alphabetical' ? 'primary' : 'secondary'}
+                  onClick={() => onViewModeChange('alphabetical')}
+                  outline={viewMode !== 'alphabetical'}
+                >
+                  Alphabetical
+                </Button>
+              </ButtonGroup>
             </div>
           </FormGroup>
         </Col>
         <Col md={3}>
           <FormGroup>
-            <Label for="category-filter">Filter by Category</Label>
+            <Label for="category-filter" className="fw-bold">Filter by Category</Label>
             <Input
               type="select"
               id="category-filter"

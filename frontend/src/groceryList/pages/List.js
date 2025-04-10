@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, ListGroup, Nav, NavItem, NavLink, Row, Col, Spinner, Alert } from 'reactstrap';
+import { Button, Card, ListGroup, Nav, NavItem, NavLink, Row, Col, Spinner, Alert } from 'reactstrap';
 import { useNavigate } from 'react-router-dom';
 import classnames from 'classnames';
 import axios from "axios";
@@ -87,16 +87,6 @@ const GroceryLists = () => {
         }
     };
 
-    const handleDelete = async (item) => {
-        try {
-            await axios.delete(`/api/grocerylist/${item.id}/`);
-            refreshList();
-        } catch (err) {
-            console.error("Error deleting grocery list:", err);
-            setError("Failed to delete grocery list. Please try again.");
-        }
-    };
-
     const createItem = () => {
         // Format current date for the default title in MM/dd/yyyy format
         const currentDate = new Date();
@@ -169,6 +159,11 @@ const GroceryLists = () => {
                     <p>{viewCompleted ?
                         "You don't have any completed grocery lists." :
                         "Add a new grocery list to get started."}</p>
+                    {!viewCompleted && (
+                        <Button color="primary" onClick={createItem} className="d-flex align-items-center mx-auto">
+                            <span className="me-1">+</span> Add List
+                        </Button>
+                    )}
                 </div>
             );
         }

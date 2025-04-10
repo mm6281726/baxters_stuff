@@ -170,7 +170,9 @@ const Ingredients = () => {
                     <div className="empty-state-icon">🌿</div>
                     <h4>No ingredients found</h4>
                     <p>Add some ingredients or adjust your search filters.</p>
-                    <Button color="success" onClick={createItem}>Add Ingredient</Button>
+                    <Button color="primary" onClick={createItem} className="d-flex align-items-center mx-auto">
+                        <span className="me-1">+</span> Add Ingredient
+                    </Button>
                 </div>
             );
         }
@@ -224,7 +226,7 @@ const Ingredients = () => {
     if (loading && ingredients.length === 0) {
         return (
             <div className="text-center mt-5">
-                <Spinner color="success" />
+                <Spinner color="primary" />
                 <p className="mt-2">Loading ingredients...</p>
             </div>
         );

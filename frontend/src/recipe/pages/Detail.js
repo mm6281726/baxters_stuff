@@ -8,7 +8,7 @@ import GroceryListSelectionModal from "../components/GroceryListSelectionModal";
 
 import RecipeItemModal from "../components/RecipeItemModal";
 import RecipeStepModal from "../components/RecipeStepModal";
-import RecipeIngredient from "../components/RecipeIngredient";
+
 import RecipeStep from "../components/RecipeStep";
 import CategoryGroup from "../components/CategoryGroup";
 import RecipeDetailActions from "../components/RecipeDetailActions";
@@ -114,10 +114,10 @@ const RecipeDetail = () => {
 
     const createStep = () => {
         // Find the next step number
-        const nextStepNumber = steps.length > 0 
-            ? Math.max(...steps.map(step => step.step_number)) + 1 
+        const nextStepNumber = steps.length > 0
+            ? Math.max(...steps.map(step => step.step_number)) + 1
             : 1;
-            
+
         setActiveStep({
             recipe: recipeId,
             step_number: nextStepNumber,
@@ -138,7 +138,7 @@ const RecipeDetail = () => {
 
     const handleItemSubmit = async (item) => {
         toggleItemModal();
-        
+
         try {
             if (item.id) {
                 // Update existing item
@@ -156,7 +156,7 @@ const RecipeDetail = () => {
 
     const handleStepSubmit = async (step) => {
         toggleStepModal();
-        
+
         try {
             if (step.id) {
                 // Update existing step
