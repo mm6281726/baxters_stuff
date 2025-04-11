@@ -35,9 +35,16 @@ class RecipeScannerService:
             user_id: The ID of the user making the request
 
         Returns:
-            Dict containing the extracted recipe data
+            Dict containing the extracted recipe data and progress updates
         """
         logger.info(f"Scanning URL: {url}")
+
+        # Initialize progress tracking
+        progress = {
+            "status": "processing",
+            "progress": 0,
+            "message": "Starting URL processing..."
+        }
 
         # Validate URL
         parsed_url = urlparse(url)
@@ -46,21 +53,31 @@ class RecipeScannerService:
 
         # Try specialized recipe scraper first
         try:
+            # Update progress - 20%
+            progress["progress"] = 20
+            progress["message"] = "Analyzing website content..."
+
             domain = parsed_url.netloc.lower()
             if any(scraper.lower() in domain for scraper in SCRAPERS.keys()):
                 logger.info(f"Using specialized scraper for {domain}")
-                return RecipeScannerService._use_specialized_scraper(url)
+                return RecipeScannerService._use_specialized_scraper(url, progress)
             else:
                 logger.info(f"No specialized scraper for {domain}, using fallback method")
-                return RecipeScannerService._use_fallback_scraper(url)
+                return RecipeScannerService._use_fallback_scraper(url, progress)
         except Exception as e:
             logger.error(f"Error scanning URL: {str(e)}")
+            progress["status"] = "error"
+            progress["message"] = f"Error: {str(e)}"
             raise ValueError(f"Failed to extract recipe data: {str(e)}")
 
     @staticmethod
-    def _use_specialized_scraper(url: str) -> Dict:
+    def _use_specialized_scraper(url: str, progress: Dict) -> Dict:
         """Use the recipe-scrapers library for supported sites"""
         try:
+            # Update progress - 40%
+            progress["progress"] = 40
+            progress["message"] = "Recognized recipe website, extracting data..."
+
             scraper = scrape_me(url)
 
             # Extract basic recipe data
@@ -71,7 +88,8 @@ class RecipeScannerService:
                 "prep_time": None,
                 "cook_time": None,
                 "ingredients": [],
-                "steps": []
+                "steps": [],
+                "progress": progress
             }
 
             # Try to get prep time and cook time, but don't fail if they're not available
@@ -107,20 +125,35 @@ class RecipeScannerService:
             except Exception as e:
                 logger.warning(f"Error extracting instructions: {str(e)}")
 
+            # Update progress - 100%
+            progress["progress"] = 100
+            progress["message"] = "Recipe processing complete!"
+            progress["status"] = "complete"
+
             return recipe_data
         except Exception as e:
             logger.warning(f"Specialized scraper failed: {str(e)}, falling back to general scraper")
-            return RecipeScannerService._use_fallback_scraper(url)
+            progress["progress"] = 30
+            progress["message"] = "Specialized scraper failed, trying alternative method..."
+            return RecipeScannerService._use_fallback_scraper(url, progress)
 
     @staticmethod
-    def _use_fallback_scraper(url: str) -> Dict:
+    def _use_fallback_scraper(url: str, progress: Dict) -> Dict:
         """Fallback method using BeautifulSoup for unsupported sites"""
+        # Update progress - 40%
+        progress["progress"] = 40
+        progress["message"] = "Analyzing webpage content..."
+
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
 
         response = requests.get(url, headers=headers)
         response.raise_for_status()
+
+        # Update progress - 60%
+        progress["progress"] = 60
+        progress["message"] = "Extracting recipe content..."
 
         soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -132,8 +165,14 @@ class RecipeScannerService:
             "prep_time": RecipeScannerService._extract_prep_time(soup),
             "cook_time": RecipeScannerService._extract_cook_time(soup),
             "ingredients": RecipeScannerService._extract_ingredients(soup),
-            "steps": RecipeScannerService._extract_steps(soup)
+            "steps": RecipeScannerService._extract_steps(soup),
+            "progress": progress
         }
+
+        # Update progress - 100%
+        progress["progress"] = 100
+        progress["message"] = "Recipe processing complete!"
+        progress["status"] = "complete"
 
         return recipe_data
 

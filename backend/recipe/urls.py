@@ -1,5 +1,5 @@
 from django.urls import path
-from .apis import RecipeAPI, RecipeItemAPI, RecipeStepAPI, RecipeScannerAPI
+from .apis import RecipeAPI, RecipeItemAPI, RecipeStepAPI, RecipeScannerAPI, RecipeImageScannerAPI
 
 urlpatterns = [
     # Recipe endpoints
@@ -19,5 +19,6 @@ urlpatterns = [
 
     # Recipe Scanner endpoints
     path('scan/', RecipeScannerAPI.scan),
+    path('scan-image/', RecipeImageScannerAPI.scan_image),
     path('create-from-scan/', RecipeScannerAPI.create_from_scan),
 ]
