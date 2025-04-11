@@ -3,7 +3,7 @@
 /* Recipe action buttons */
 .recipe-action-buttons {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 
 .recipe-action-buttons .btn {
@@ -36,6 +36,14 @@
   color: #6c757d;
   font-size: 0.875rem;
   margin-top: 5px;
+  white-space: pre-line;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  max-height: 4.5em; /* Approximately 3 lines of text */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .recipe-meta {
@@ -44,12 +52,13 @@
   margin-top: 5px;
 }
 
-.recipe-actions {
+.recipe-actions, .recipe-item-actions {
   opacity: 0.3;
   transition: opacity 0.2s ease;
 }
 
-.recipe-item:hover .recipe-actions {
+.recipe-item:hover .recipe-actions,
+.recipe-item:hover .recipe-item-actions {
   opacity: 1;
 }
 

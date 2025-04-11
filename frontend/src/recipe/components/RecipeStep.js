@@ -1,13 +1,10 @@
 import React from 'react';
-import { ListGroupItem, Button } from 'reactstrap';
+import { ListGroupItem } from 'reactstrap';
 import '../pages/Detail.css';
 
-const RecipeStep = ({ step, onEdit, onDelete }) => {
-  const handleRowClick = (e) => {
-    // Only edit if not clicking on delete button
-    if (!e.target.closest('.recipe-step-actions')) {
-      onEdit(step);
-    }
+const RecipeStep = ({ step, onEdit }) => {
+  const handleRowClick = () => {
+    onEdit(step);
   };
 
   return (
@@ -18,22 +15,10 @@ const RecipeStep = ({ step, onEdit, onDelete }) => {
       style={{ cursor: 'pointer' }}
     >
       <div className="flex-grow-1">
-        <div className="d-flex">
+        <div className="d-flex flex-grow-1">
           <span className="recipe-step-number">Step {step.step_number}:</span>
           <span className="recipe-step-description">{step.description}</span>
         </div>
-      </div>
-      <div className="recipe-step-actions">
-        <Button
-          color="danger"
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent row click handler from firing
-            onDelete(step);
-          }}
-          size="sm"
-        >
-          Delete
-        </Button>
       </div>
     </ListGroupItem>
   );

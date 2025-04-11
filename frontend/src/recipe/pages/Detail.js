@@ -8,6 +8,7 @@ import GroceryListSelectionModal from "../components/GroceryListSelectionModal";
 
 import RecipeItemModal from "../components/RecipeItemModal";
 import RecipeStepModal from "../components/RecipeStepModal";
+import RecipeEditModal from "../components/RecipeEditModal";
 
 import RecipeStep from "../components/RecipeStep";
 import CategoryGroup from "../components/CategoryGroup";
@@ -26,6 +27,7 @@ const RecipeDetail = () => {
     const [error, setError] = useState("");
     const [itemModal, setItemModal] = useState(false);
     const [stepModal, setStepModal] = useState(false);
+    const [editModal, setEditModal] = useState(false);
     const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
     const [groceryListSelectionModal, setGroceryListSelectionModal] = useState(false);
     const [activeItem, setActiveItem] = useState({
@@ -47,6 +49,7 @@ const RecipeDetail = () => {
         fetchRecipe();
         refreshItems();
         refreshSteps();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const fetchRecipe = async () => {
@@ -98,6 +101,10 @@ const RecipeDetail = () => {
 
     const toggleStepModal = () => {
         setStepModal(!stepModal);
+    };
+
+    const toggleEditModal = () => {
+        setEditModal(!editModal);
     };
 
     const createItem = () => {
@@ -196,6 +203,10 @@ const RecipeDetail = () => {
         navigate('/recipes');
     };
 
+    const editRecipe = () => {
+        toggleEditModal();
+    };
+
     const confirmDeleteRecipe = () => {
         setDeleteConfirmationModal(true);
     };
@@ -208,6 +219,17 @@ const RecipeDetail = () => {
         } catch (err) {
             console.error("Error deleting recipe:", err);
             setError("Failed to delete recipe. Please try again.");
+        }
+    };
+
+    const handleRecipeSubmit = async (updatedRecipe) => {
+        toggleEditModal();
+        try {
+            await axios.put(`/api/recipes/${recipeId}/`, updatedRecipe);
+            fetchRecipe(); // Refresh the recipe data
+        } catch (err) {
+            console.error("Error updating recipe:", err);
+            setError("Failed to update recipe. Please try again.");
         }
     };
 
@@ -289,7 +311,6 @@ const RecipeDetail = () => {
                 categoryName={categoryName}
                 items={groupedItems[categoryName]}
                 onEdit={editItem}
-                onDelete={handleDeleteItem}
             />
         ));
     };
@@ -315,7 +336,6 @@ const RecipeDetail = () => {
                         key={step.id}
                         step={step}
                         onEdit={editStep}
-                        onDelete={handleDeleteStep}
                     />
                 ))}
             </ListGroup>
@@ -358,7 +378,7 @@ const RecipeDetail = () => {
                         </div>
 
                         {recipe?.description && (
-                            <div className="recipe-description mb-4">
+                            <div className="recipe-detail-description mb-4">
                                 <h5>Description</h5>
                                 <p>{recipe.description}</p>
                             </div>
@@ -396,6 +416,7 @@ const RecipeDetail = () => {
                         <RecipeDetailActions
                             onAddItem={createItem}
                             onAddStep={createStep}
+                            onEditRecipe={editRecipe}
                             onDeleteRecipe={confirmDeleteRecipe}
                             onAddToGroceryList={openGroceryListSelectionModal}
                         />
@@ -420,6 +441,7 @@ const RecipeDetail = () => {
                     activeItem={activeItem}
                     toggle={toggleItemModal}
                     onSave={handleItemSubmit}
+                    onDelete={handleDeleteItem}
                 />
             )}
 
@@ -428,6 +450,7 @@ const RecipeDetail = () => {
                     activeStep={activeStep}
                     toggle={toggleStepModal}
                     onSave={handleStepSubmit}
+                    onDelete={handleDeleteStep}
                 />
             )}
 
@@ -446,6 +469,14 @@ const RecipeDetail = () => {
                     isOpen={groceryListSelectionModal}
                     toggle={() => setGroceryListSelectionModal(false)}
                     onSelect={addToGroceryList}
+                />
+            )}
+
+            {editModal && recipe && (
+                <RecipeEditModal
+                    recipe={recipe}
+                    toggle={toggleEditModal}
+                    onSave={handleRecipeSubmit}
                 />
             )}
         </div>

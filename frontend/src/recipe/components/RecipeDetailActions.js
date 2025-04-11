@@ -2,7 +2,7 @@ import React from 'react';
 import { Button } from 'reactstrap';
 import '../pages/Detail.css';
 
-const RecipeDetailActions = ({ onAddItem, onAddStep, onDeleteRecipe, onAddToGroceryList }) => {
+const RecipeDetailActions = ({ onAddItem, onAddStep, onDeleteRecipe, onAddToGroceryList, onEditRecipe }) => {
   return (
     <div className="recipe-detail-action-buttons mb-4">
       <Button
@@ -18,6 +18,13 @@ const RecipeDetailActions = ({ onAddItem, onAddStep, onDeleteRecipe, onAddToGroc
         className="me-2 d-flex align-items-center"
       >
         <span className="me-1">+</span> Add Step
+      </Button>
+      <Button
+        color="info"
+        onClick={onEditRecipe}
+        className="me-2"
+      >
+        Edit Recipe
       </Button>
       <Button
         color="success"

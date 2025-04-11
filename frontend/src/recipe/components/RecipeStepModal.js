@@ -13,7 +13,7 @@ import {
 } from "reactstrap";
 import "../pages/Detail.css";
 
-const RecipeStepModal = ({ activeStep: initialStep, toggle, onSave }) => {
+const RecipeStepModal = ({ activeStep: initialStep, toggle, onSave, onDelete }) => {
   const [activeStep, setActiveStep] = useState(initialStep);
   const [error, setError] = useState("");
 
@@ -23,7 +23,7 @@ const RecipeStepModal = ({ activeStep: initialStep, toggle, onSave }) => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name === 'step_number') {
       const numValue = value === '' ? '' : parseInt(value);
       setActiveStep({
@@ -85,15 +85,24 @@ const RecipeStepModal = ({ activeStep: initialStep, toggle, onSave }) => {
         </Form>
       </ModalBody>
       <ModalFooter className="bg-light">
-        <Button color="secondary" onClick={toggle}>
-          Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={handleSubmit}
-        >
-          Save
-        </Button>
+        <div className="d-flex justify-content-between w-100">
+          {initialStep.id && (
+            <Button color="danger" onClick={() => { onDelete(initialStep); toggle(); }}>
+              Delete
+            </Button>
+          )}
+          <div>
+            <Button color="secondary" onClick={toggle} className="me-2">
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Save
+            </Button>
+          </div>
+        </div>
       </ModalFooter>
     </Modal>
   );
