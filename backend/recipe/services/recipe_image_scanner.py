@@ -189,6 +189,12 @@ class RecipeImageScannerService:
             # Description section headers
             elif (re.search(r'^description\b|^about\b|^notes\b|^introduction\b', line_lower) or
                   re.search(r'^recipe\s+(?:description|notes|tips)\b|^chef.s\s+notes\b', line_lower)):
+                # Check if the line contains a colon followed by text (e.g., "Description: Some text")
+                if ":" in line:
+                    # Extract the description part after the colon
+                    description_part = line[line.index(":") + 1:].strip()
+                    if description_part:
+                        description_lines.append(description_part)
                 current_section = "description"
                 continue
             elif "prep time" in line_lower or "preparation time" in line_lower:
@@ -378,7 +384,7 @@ class RecipeImageScannerService:
 
             # Try to extract quantity and unit only if there's a clear pattern
             # Look for patterns like "1 cup" or "2 tablespoons"
-            match = re.match(r'^(\d+(?:\s*[\./]\s*\d+)?)\s*([a-zA-Z]+)?\s+(.+)$', line.strip())
+            match = re.match(r'^(\d+(?:\s+\d+\/\d+)?|\d+\/\d+)\s+([a-zA-Z]+)\s+(.+)$', line.strip())
 
             if match:
                 quantity_str = match.group(1).strip()
@@ -388,11 +394,15 @@ class RecipeImageScannerService:
                 # Only process if we have all parts
                 if quantity_str and name_part:
                     try:
-                        # Handle fractions like "1/2"
-                        if '/' in quantity_str:
-                            parts = quantity_str.replace(' ', '').split('/')
-                            if len(parts) == 2:
-                                ingredient["quantity"] = float(parts[0]) / float(parts[1])
+                        # Handle mixed fractions like "2 1/4"
+                        if ' ' in quantity_str and '/' in quantity_str:
+                            whole_part, fraction_part = quantity_str.split(' ', 1)
+                            num, denom = fraction_part.split('/')
+                            ingredient["quantity"] = float(whole_part) + (float(num) / float(denom))
+                        # Handle simple fractions like "1/2"
+                        elif '/' in quantity_str:
+                            num, denom = quantity_str.split('/')
+                            ingredient["quantity"] = float(num) / float(denom)
                         else:
                             ingredient["quantity"] = float(quantity_str)
 
@@ -413,6 +423,17 @@ class RecipeImageScannerService:
                 ingredient["notes"] = notes_match.group(1).strip()
                 # Remove notes from name
                 ingredient["name"] = re.sub(r'\([^)]+\)', '', ingredient["name"]).strip()
+
+            # Look for preparation instructions after commas
+            if ',' in ingredient["name"]:
+                parts = ingredient["name"].split(',', 1)
+                ingredient["name"] = parts[0].strip()
+                if len(parts) > 1 and parts[1].strip():
+                    # Add the part after comma as notes
+                    if ingredient["notes"]:
+                        ingredient["notes"] += "; " + parts[1].strip()
+                    else:
+                        ingredient["notes"] = parts[1].strip()
 
             # Clean up the name
             ingredient["name"] = ingredient["name"].strip(',.:;')
