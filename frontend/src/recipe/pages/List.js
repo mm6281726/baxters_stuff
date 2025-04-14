@@ -8,6 +8,7 @@ import RecipeModal from "../components/RecipeModal";
 import RecipeItem from "../components/RecipeItem";
 import RecipeSearch from "../components/RecipeSearch";
 import RecipeActions from "../components/RecipeActions";
+import RecipeScanner from "../components/RecipeScanner";
 
 const Recipes = () => {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ const Recipes = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [modal, setModal] = useState(false);
+    const [scannerModal, setScannerModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [activeItem, setActiveItem] = useState({
         title: "",
@@ -34,6 +36,7 @@ const Recipes = () => {
     // Filter recipes when search term changes
     useEffect(() => {
         filterRecipes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [recipes, searchTerm]);
 
     const refreshList = async () => {
@@ -65,6 +68,17 @@ const Recipes = () => {
 
     const toggle = () => {
         setModal(!modal);
+    };
+
+    const toggleScanner = () => {
+        setScannerModal(!scannerModal);
+    };
+
+    const handleScanComplete = (recipe) => {
+        // Refresh the list to include the newly created recipe
+        refreshList();
+        // Navigate to the new recipe
+        navigate(`/recipes/${recipe.id}`);
     };
 
     const createItem = () => {
@@ -165,6 +179,7 @@ const Recipes = () => {
 
                         <RecipeActions
                             onAddRecipe={createItem}
+                            onScanRecipe={toggleScanner}
                         />
 
                         {renderRecipes()}
@@ -177,6 +192,14 @@ const Recipes = () => {
                     activeItem={activeItem}
                     toggle={toggle}
                     onSave={handleSubmit}
+                />
+            )}
+
+            {scannerModal && (
+                <RecipeScanner
+                    isOpen={scannerModal}
+                    toggle={toggleScanner}
+                    onScanComplete={handleScanComplete}
                 />
             )}
         </div>

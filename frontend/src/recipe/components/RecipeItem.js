@@ -10,10 +10,10 @@ const RecipeItem = ({ recipe, onView }) => {
   // Format time display
   const formatTime = (minutes) => {
     if (!minutes) return '';
-    
+
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
-    
+
     if (hours > 0) {
       return `${hours}h ${mins > 0 ? `${mins}m` : ''}`;
     }
@@ -40,8 +40,8 @@ const RecipeItem = ({ recipe, onView }) => {
         </div>
         {recipe.description && (
           <div className="recipe-description">
-            {recipe.description.length > 100 
-              ? `${recipe.description.substring(0, 100)}...` 
+            {recipe.description.length > 250
+              ? `${recipe.description.substring(0, 250)}...`
               : recipe.description}
           </div>
         )}

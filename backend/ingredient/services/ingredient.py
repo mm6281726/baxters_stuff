@@ -47,6 +47,47 @@ class IngredientService:
         return Ingredient.objects.filter(id=id).first()
 
     @staticmethod
+    def find_or_create_ingredient(name, user_id=None, categories=None):
+        """
+        Find an existing ingredient by name or create a new one
+
+        Args:
+            name: The name of the ingredient to find or create
+            user_id: The ID of the user creating the ingredient (if needed)
+            categories: Optional list of category IDs to assign to the ingredient
+
+        Returns:
+            Ingredient object (either existing or newly created)
+        """
+        # Try to find an existing ingredient with the same name
+        name = name.strip().lower()
+        ingredient = Ingredient.objects.filter(name__iexact=name).first()
+
+        if ingredient:
+            return ingredient
+
+        # Create a new ingredient if none exists
+        validated_data = {
+            'name': name.capitalize(),
+            'description': '',
+            'categories': categories or []
+        }
+
+        # Process categories if provided
+        if categories:
+            validated_data['categories'] = IngredientService.__process_categoryids(categories)
+
+        # Create the ingredient
+        serializer = IngredientSerializer(data=validated_data)
+        if serializer.is_valid():
+            serializer.save()
+            # Get the newly created ingredient
+            return Ingredient.objects.get(id=serializer.data['id'])
+        else:
+            # If there was an error, create a basic ingredient without categories
+            return Ingredient.objects.create(name=name.capitalize(), description='')
+
+    @staticmethod
     def __process_categoryids(categories):
         if not categories:
             return []

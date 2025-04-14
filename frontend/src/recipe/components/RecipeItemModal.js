@@ -16,7 +16,7 @@ import {
 import IngredientSelect from "../../groceryList/components/IngredientSelect";
 import "../pages/Detail.css";
 
-const RecipeItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
+const RecipeItemModal = ({ activeItem: initialItem, toggle, onSave, onDelete }) => {
   const [activeItem, setActiveItem] = useState(initialItem);
   const [error, setError] = useState("");
 
@@ -142,15 +142,24 @@ const RecipeItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
         </Form>
       </ModalBody>
       <ModalFooter className="bg-light">
-        <Button color="secondary" onClick={toggle}>
-          Cancel
-        </Button>
-        <Button
-          color="primary"
-          onClick={handleSubmit}
-        >
-          Save
-        </Button>
+        <div className="d-flex justify-content-between w-100">
+          {initialItem.id && (
+            <Button color="danger" onClick={() => { onDelete(initialItem); toggle(); }}>
+              Delete
+            </Button>
+          )}
+          <div>
+            <Button color="secondary" onClick={toggle} className="me-2">
+              Cancel
+            </Button>
+            <Button
+              color="primary"
+              onClick={handleSubmit}
+            >
+              Save
+            </Button>
+          </div>
+        </div>
       </ModalFooter>
     </Modal>
   );
