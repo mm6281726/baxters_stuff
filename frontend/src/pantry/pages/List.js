@@ -20,6 +20,7 @@ const PantryItems = () => {
         ingredient_details: null,
         quantity: 1,
         unit: "",
+        stock_level: "medium",
         notes: ""
     });
     const [searchTerm, setSearchTerm] = useState("");

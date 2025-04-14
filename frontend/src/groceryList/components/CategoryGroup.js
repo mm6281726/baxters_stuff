@@ -12,7 +12,7 @@ const CategoryGroup = ({ categoryName, items, onTogglePurchased, onEdit, onDelet
 
   return (
     <div className="mb-4">
-      <div 
+      <div
         className={`category-header ${isCollapsed ? 'collapsed' : ''}`}
         onClick={toggleCollapse}
       >
@@ -21,7 +21,7 @@ const CategoryGroup = ({ categoryName, items, onTogglePurchased, onEdit, onDelet
           {isCollapsed ? '▶' : '▼'}
         </span>
       </div>
-      
+
       {!isCollapsed && (
         <ListGroup className="mb-3">
           {items.map(item => (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListGroupItem, Button } from 'reactstrap';
+import { ListGroupItem, Button, Badge } from 'reactstrap';
 import '../pages/List.css';
 
 const PantryItem = ({ item, onEdit, onDelete }) => {
@@ -10,6 +10,22 @@ const PantryItem = ({ item, onEdit, onDelete }) => {
     }
   };
 
+  // Stock level colors for visual indication
+  const stockLevelColors = {
+    high: 'success',
+    medium: 'info',
+    low: 'warning',
+    out: 'danger'
+  };
+
+  // Stock level icons
+  const stockLevelIcons = {
+    high: 'bi-battery-full',
+    medium: 'bi-battery-half',
+    low: 'bi-battery-low',
+    out: 'bi-battery'
+  };
+
   return (
     <ListGroupItem
       key={item.id}
@@ -18,9 +34,23 @@ const PantryItem = ({ item, onEdit, onDelete }) => {
       style={{ cursor: 'pointer' }}
     >
       <div className="d-flex flex-column">
-        <span className="pantry-item-title">
-          {item.unit ? item.quantity : Math.round(item.quantity)} {item.unit} {item.ingredient_details?.name}
-        </span>
+        <div className="d-flex align-items-center mb-1">
+          <Badge
+            color={stockLevelColors[item.stock_level || 'medium']}
+            className="me-2 d-flex align-items-center"
+          >
+            <i className={`bi ${stockLevelIcons[item.stock_level || 'medium']} me-1`}></i>
+            {item.stock_level ? item.stock_level.charAt(0).toUpperCase() + item.stock_level.slice(1) : 'Medium'}
+          </Badge>
+          <span className="pantry-item-title">
+            {item.ingredient_details?.name}
+          </span>
+        </div>
+        {(item.quantity != null && item.quantity !== "") && (
+          <small className="pantry-item-details text-muted">
+            Quantity: {item.quantity} {item.unit || ''}
+          </small>
+        )}
         {item.notes && <small className="pantry-item-details">{item.notes}</small>}
       </div>
       <div className="pantry-item-actions">
