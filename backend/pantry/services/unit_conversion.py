@@ -1,9 +1,7 @@
-from decimal import Decimal
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 from measurement.services.unit_conversion import convert_units as measurement_convert_units
 from ..models import PantryItem
-from ingredient.models import Ingredient
 
 class PantryUnitConversionService:
     """
@@ -97,12 +95,63 @@ class PantryUnitConversionService:
                 }
             # If to_unit is specified, use that as the target unit
             elif to_unit:
+                try:
+                    # First convert pantry item to the target unit if needed
+                    if existing_pantry_item.unit != to_unit:
+                        pantry_converted_quantity = measurement_convert_units(
+                            existing_pantry_item.quantity,
+                            existing_pantry_item.unit,
+                            to_unit,
+                            existing_pantry_item.ingredient.name
+                        )
+                        existing_pantry_item.quantity = pantry_converted_quantity
+                        existing_pantry_item.unit = to_unit
+
+                    # Then convert grocery item to the target unit
+                    grocery_converted_quantity = measurement_convert_units(
+                        grocery_item.quantity,
+                        grocery_item.unit,
+                        to_unit,
+                        grocery_item.ingredient.name
+                    )
+
+                    # Update the pantry item
+                    existing_pantry_item.quantity += grocery_converted_quantity
+                    existing_pantry_item.save()
+
+                    return {
+                        "id": existing_pantry_item.id,
+                        "quantity": float(existing_pantry_item.quantity),
+                        "unit": to_unit,
+                        "stock_level": existing_pantry_item.stock_level,
+                        "converted": True
+                    }
+                except Exception:
+                    # If conversion fails, create a new item with the original unit
+                    new_item = PantryItem.objects.create(
+                        user_id=user_id,
+                        ingredient=grocery_item.ingredient,
+                        quantity=grocery_item.quantity,
+                        unit=grocery_item.unit,
+                        stock_level='high',  # New items start at high stock
+                        notes=f"Added from grocery list: {grocery_item.grocery_list.title}"
+                    )
+
+                    return {
+                        "id": new_item.id,
+                        "quantity": float(new_item.quantity),
+                        "unit": new_item.unit,
+                        "stock_level": new_item.stock_level,
+                        "converted": False
+                    }
             else:
                 # Different units - try to convert
                 try:
+                    # Use pantry item's unit as the target unit
+                    target_unit = existing_pantry_item.unit
+
                     # Convert grocery item to pantry item's unit
-                    target_unit = to_unit or existing_pantry_item.unit
-                    converted_quantity = measurement_convert_units(
+                    grocery_converted_quantity = measurement_convert_units(
                         grocery_item.quantity,
                         grocery_item.unit,
                         target_unit,
@@ -110,8 +159,7 @@ class PantryUnitConversionService:
                     )
 
                     # Update the pantry item
-                    existing_pantry_item.quantity += converted_quantity
-                    existing_pantry_item.unit = target_unit
+                    existing_pantry_item.quantity += grocery_converted_quantity
                     existing_pantry_item.save()
 
                     return {
@@ -121,7 +169,7 @@ class PantryUnitConversionService:
                         "stock_level": existing_pantry_item.stock_level,
                         "converted": True
                     }
-                except Exception as e:
+                except Exception:
                     # If conversion fails, create a new item with the original unit
                     new_item = PantryItem.objects.create(
                         user_id=user_id,

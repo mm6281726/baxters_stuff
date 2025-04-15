@@ -13,9 +13,9 @@ const PantryItem = ({ item, onEdit, onDelete }) => {
   // Stock level colors for visual indication
   const stockLevelColors = {
     high: 'success',
-    medium: 'info',
-    low: 'warning',
-    out: 'danger'
+    medium: 'warning',
+    low: 'danger',
+    out: 'dark'
   };
 
   // Stock level icons

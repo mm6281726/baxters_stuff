@@ -14,8 +14,8 @@ import {
   Alert,
   FormText
 } from "reactstrap";
+import axios from "axios";
 import IngredientSelect from "../../groceryList/components/IngredientSelect";
-import UnitConverter from "../../common/components/UnitConverter";
 import UnitSelect from "../../common/components/UnitSelect";
 import "../pages/List.css";
 
@@ -27,7 +27,8 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
   useEffect(() => {
     setActiveItem(initialItem);
     // If quantity and unit are set, show the exact quantity section
-    setShowExactQuantity(initialItem.quantity != null && initialItem.quantity !== "");
+    // Otherwise, default to false (track exact quantity off by default)
+    setShowExactQuantity(initialItem.quantity != null && initialItem.quantity !== "" ? true : false);
   }, [initialItem]);
 
   const handleChange = (e) => {
@@ -51,6 +52,36 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
 
     updatedItem[name] = value;
     setActiveItem(updatedItem);
+  };
+
+  // Handle unit change with automatic conversion
+  const handleUnitChange = async (newUnit) => {
+    // If no ingredient or quantity, just update the unit without conversion
+    if (!activeItem.ingredient || !activeItem.quantity || !activeItem.unit || newUnit === activeItem.unit) {
+      setActiveItem({ ...activeItem, unit: newUnit });
+      return;
+    }
+
+    try {
+      // Convert the quantity to the new unit
+      const response = await axios.post('/api/measurement/convert/', {
+        quantity: parseFloat(activeItem.quantity),
+        from_unit: activeItem.unit,
+        to_unit: newUnit,
+        ingredient_id: activeItem.ingredient
+      });
+
+      // Update the item with the converted quantity and new unit
+      setActiveItem({
+        ...activeItem,
+        quantity: response.data.converted_quantity,
+        unit: newUnit
+      });
+    } catch (err) {
+      console.error('Conversion error:', err);
+      // If conversion fails, just update the unit without changing the quantity
+      setActiveItem({ ...activeItem, unit: newUnit });
+    }
   };
 
   const handleIngredientChange = (selectedIngredient) => {
@@ -89,9 +120,9 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
   // Stock level colors for visual indication
   const stockLevelColors = {
     high: 'success',
-    medium: 'info',
-    low: 'warning',
-    out: 'danger'
+    medium: 'warning',
+    low: 'danger',
+    out: 'dark'
   };
 
   // Stock level icons
@@ -179,26 +210,12 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
                 <Col md={6}>
                   <UnitSelect
                     value={activeItem.unit || ""}
-                    onChange={(value) => setActiveItem({ ...activeItem, unit: value })}
+                    onChange={handleUnitChange}
                     label="Unit"
                   />
                 </Col>
               </Row>
 
-              {activeItem.ingredient && activeItem.unit && (
-                <UnitConverter
-                  ingredientId={activeItem.ingredient}
-                  initialQuantity={activeItem.quantity}
-                  initialUnit={activeItem.unit}
-                  onConvert={(convertedQuantity, convertedUnit) => {
-                    setActiveItem({
-                      ...activeItem,
-                      quantity: convertedQuantity,
-                      unit: convertedUnit
-                    });
-                  }}
-                />
-              )}
             </>
           )}
           <FormGroup className="mb-3">
