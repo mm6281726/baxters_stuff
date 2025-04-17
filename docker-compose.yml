@@ -1,18 +1,38 @@
+version: '3.8'
+
 services:
-  baxters_stuff:
-    container_name: baxters_stuff
-    build: .
-    image: baxters_stuff:latest
+  backend:
+    container_name: baxters_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: baxters_backend:latest
+    restart: unless-stopped
     volumes:
-      - data:/data/db
-    networks:
-      default:
-        ipv4_address: 192.168.15.7
+      - backend_data:/app/backend/instance
+      - nltk_data:/app/nltk_data
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-default_secret_key_change_in_production}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,frontend
+      - CORS_ORIGIN_WHITELIST=http://localhost,http://frontend
+      - CSRF_TRUSTED_ORIGINS=http://localhost,http://frontend
+      - FRONTEND_URL=http://localhost
+    ports:
+      - "9090:9090"
+
+  frontend:
+    container_name: baxters_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: baxters_frontend:latest
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"
 
 volumes:
-  data:
-
-networks:
-  default:
-    name: baxternet
-    external: true
+  backend_data:
+  nltk_data:

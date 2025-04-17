@@ -11,8 +11,8 @@ from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# Set NLTK data path to a directory within the project
-nltk_data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'nltk_data')
+# Set NLTK data path from environment variable or use a default path
+nltk_data_dir = os.environ.get('NLTK_DATA', os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'nltk_data'))
 os.makedirs(nltk_data_dir, exist_ok=True)
 nltk.data.path.append(nltk_data_dir)
 
@@ -22,6 +22,7 @@ try:
     nltk.data.find('taggers/averaged_perceptron_tagger')
     logger.info("NLTK data loaded successfully")
 except LookupError:
+    logger.info(f"Downloading NLTK data to {nltk_data_dir}")
     nltk.download('punkt', download_dir=nltk_data_dir)
     nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_dir)
     logger.info("Downloaded NLTK data successfully")

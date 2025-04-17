@@ -25,6 +25,10 @@ build/
 # production
 **/build
 
+# NLTK data directory
+nltk_data/
+**/nltk_data/
+
 # misc
 .DS_Store
 .env
