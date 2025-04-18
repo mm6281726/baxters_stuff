@@ -230,7 +230,12 @@ class RecipeImageScannerService:
         recipe_data["steps"] = RecipeImageScannerService._parse_instructions(instruction_section)
 
         # Set description
-        recipe_data["description"] = " ".join(description_lines)
+        if description_lines:
+            recipe_data["description"] = " ".join(description_lines)
+        else:
+            # If no description was found, create a default one based on the title
+            if recipe_data["title"]:
+                recipe_data["description"] = f"Classic {recipe_data['title'].lower()} recipe."
 
         return recipe_data
 
@@ -383,8 +388,8 @@ class RecipeImageScannerService:
             }
 
             # Try to extract quantity and unit only if there's a clear pattern
-            # Look for patterns like "1 cup" or "2 tablespoons"
-            match = re.match(r'^(\d+(?:\s*[\./]\s*\d+)?)\s*([a-zA-Z]+)?\s+(.+)$', line.strip())
+            # Look for patterns like "1 cup", "2 tablespoons", or "2 1/4 cups"
+            match = re.match(r'^(\d+\s+\d+\/\d+|\d+(?:\s*[\./]\s*\d+)?)\s*([a-zA-Z]+)?\s+(.+)$', line.strip())
 
             if match:
                 quantity_str = match.group(1).strip()
@@ -394,8 +399,14 @@ class RecipeImageScannerService:
                 # Only process if we have all parts
                 if quantity_str and name_part:
                     try:
-                        # Handle fractions like "1/2"
-                        if '/' in quantity_str:
+                        # Handle mixed fractions like "2 1/4"
+                        if ' ' in quantity_str and '/' in quantity_str:
+                            whole_part, fraction_part = quantity_str.split(' ', 1)
+                            fraction_parts = fraction_part.split('/')
+                            if len(fraction_parts) == 2:
+                                ingredient["quantity"] = float(whole_part) + (float(fraction_parts[0]) / float(fraction_parts[1]))
+                        # Handle simple fractions like "1/2"
+                        elif '/' in quantity_str:
                             parts = quantity_str.replace(' ', '').split('/')
                             if len(parts) == 2:
                                 ingredient["quantity"] = float(parts[0]) / float(parts[1])
@@ -419,6 +430,15 @@ class RecipeImageScannerService:
                 ingredient["notes"] = notes_match.group(1).strip()
                 # Remove notes from name
                 ingredient["name"] = re.sub(r'\([^)]+\)', '', ingredient["name"]).strip()
+
+            # Extract notes after comma
+            comma_match = re.search(r',\s*(.+)$', ingredient["name"])
+            if comma_match:
+                # Only use comma notes if we don't already have notes
+                if not ingredient["notes"]:
+                    ingredient["notes"] = comma_match.group(1).strip()
+                # Remove notes from name
+                ingredient["name"] = re.sub(r',\s*.+$', '', ingredient["name"]).strip()
 
             # Clean up the name
             ingredient["name"] = ingredient["name"].strip(',.:;')
