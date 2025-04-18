@@ -195,6 +195,12 @@ class RecipeImageScannerService:
             # Description section headers
             elif (re.search(r'^description\b|^about\b|^notes\b|^introduction\b', line_lower) or
                   re.search(r'^recipe\s+(?:description|notes|tips)\b|^chef.s\s+notes\b', line_lower)):
+                # Check if the line contains a colon followed by text (e.g., "Description: Some text")
+                if ":" in line:
+                    # Extract the description part after the colon
+                    description_part = line[line.index(":") + 1:].strip()
+                    if description_part:
+                        description_lines.append(description_part)
                 current_section = "description"
                 continue
             elif "prep time" in line_lower or "preparation time" in line_lower:
@@ -387,7 +393,6 @@ class RecipeImageScannerService:
                 "notes": ""
             }
 
-            # Try to extract quantity and unit only if there's a clear pattern
             # Look for patterns like "1 cup", "2 tablespoons", or "2 1/4 cups"
             match = re.match(r'^(\d+\s+\d+\/\d+|\d+(?:\s*[\./]\s*\d+)?)\s*([a-zA-Z]+)?\s+(.+)$', line.strip())
 
