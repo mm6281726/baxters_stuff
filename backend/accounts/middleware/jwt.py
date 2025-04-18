@@ -5,7 +5,7 @@ from ..services import LoginService
 
 class JwtMiddleware:
     PREFIX = 'JWT '
-    allowPaths = ('/api/accounts/',)
+    allowPaths = ('/api/accounts/', '/api/health/')
 
     def __init__(self, get_response):
         self.get_response = get_response

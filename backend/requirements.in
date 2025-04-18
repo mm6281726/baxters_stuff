@@ -1,0 +1,20 @@
+# Core dependencies
+Django
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+gunicorn
+django-environ
+
+# Recipe Scanner dependencies
+requests
+beautifulsoup4
+ratelimit
+recipe-scrapers
+
+# Recipe Image Scanner dependencies
+pytesseract>=0.3.10
+Pillow>=10.0.0
+opencv-python>=4.8.0
+numpy>=2.0.0
+nltk>=3.9.1

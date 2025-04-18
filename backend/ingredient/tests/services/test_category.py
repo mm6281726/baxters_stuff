@@ -8,14 +8,14 @@ class IngredientCategoryServiceTests(TestCase):
     def setUp(self):
         IngredientCategory.objects.create(name="Test Name", description="Test Description",)
         IngredientCategory.objects.create(name="Test Name 2", description="Test Description 2",)
-    
+
     def test_list(self):
         """
         Test list() function returns JSON formatted list of IngredientCategorys
         """
         categories = IngredientCategoryService.list()
         self.assertIsNotNone(categories)
-        self.assertEquals(categories[0]['id'], 1)
+        self.assertEqual(categories[0]['id'], 1)
 
     def test_get(self):
         """

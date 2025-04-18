@@ -1,18 +1,34 @@
 services:
   baxters_stuff:
     container_name: baxters_stuff
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: baxters_stuff:latest
+    restart: unless-stopped
     volumes:
-      - data:/data/db
-    networks:
-      default:
-        ipv4_address: 192.168.15.7
+      - backend_data:/app/backend/instance
+      - nltk_data:/app/nltk_data
+      - backups:/app/backups
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY:-default_secret_key_change_in_production}
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - CORS_ORIGIN_WHITELIST=http://localhost
+      - CSRF_TRUSTED_ORIGINS=http://localhost
+      - FRONTEND_URL=http://localhost
+      # Initial data
+      - LOAD_INITIAL_DATA=true
+    ports:
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  data:
-
-networks:
-  default:
-    name: baxternet
-    external: true
+  backend_data:
+  nltk_data:
+  backups:

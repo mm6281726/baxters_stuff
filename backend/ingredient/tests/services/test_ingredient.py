@@ -6,18 +6,18 @@ from ...services import IngredientService
 
 
 class IngredientServiceTests(TestCase):
-    def setUp(self):        
+    def setUp(self):
         Ingredient.objects.create(name="Test Name", description="Test Description",)
         Ingredient.objects.create(name="Test Name 2", description="Test Description 2",)
         IngredientCategory.objects.create(name="Test Name", description="Test Description",)
-    
+
     def test_list(self):
         """
         Test list() function returns JSON formatted list of Ingredients
         """
         ingredients = IngredientService.list()
         self.assertIsNotNone(ingredients)
-        self.assertEquals(ingredients[0]['id'], 1)
+        self.assertEqual(ingredients[0]['id'], 1)
 
     def test_get(self):
         """

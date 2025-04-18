@@ -1,21 +1,37 @@
-FROM python:3.8
+FROM python:3.13-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_ROOT_USER_ACTION=ignore \
+    NLTK_DATA=/app/nltk_data
+
+# Install system dependencies for OpenCV and Tesseract
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    tesseract-ocr \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a working directory
-RUN mkdir /baxters_stuff
-WORKDIR /baxters_stuff
+WORKDIR /app
 
-# Copy the files in the current directory to the working directory
-COPY . /baxters_stuff
-# COPY requirements.txt /baxters_stuff/
+# Install dependencies first (better layer caching)
+COPY requirements.txt /app/
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# export env vars
-ENV PIP_ROOT_USER_ACTION=ignore
+# Create necessary directories
+RUN mkdir -p /app/nltk_data /app/backend/instance
 
-# Install required packages
-RUN pip3 install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+# Copy project files
+COPY . /app/
 
-# Expose port 80
-EXPOSE 80
+# Expose port 9090
+EXPOSE 9090
 
 # Run the web service
-CMD ["gunicorn", "backend.wsgi", "-b", "0.0.0.0:80", "-w", "4", "-n", "baxters_inventory"]
+CMD ["gunicorn", "backend.wsgi", "-b", "0.0.0.0:9090", "-w", "4", "-n", "baxters_inventory"]

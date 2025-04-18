@@ -11,8 +11,8 @@ from typing import Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
-# Set NLTK data path to a directory within the project
-nltk_data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'nltk_data')
+# Set NLTK data path from environment variable or use a default path
+nltk_data_dir = os.environ.get('NLTK_DATA', os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'nltk_data'))
 os.makedirs(nltk_data_dir, exist_ok=True)
 nltk.data.path.append(nltk_data_dir)
 
@@ -22,6 +22,7 @@ try:
     nltk.data.find('taggers/averaged_perceptron_tagger')
     logger.info("NLTK data loaded successfully")
 except LookupError:
+    logger.info(f"Downloading NLTK data to {nltk_data_dir}")
     nltk.download('punkt', download_dir=nltk_data_dir)
     nltk.download('averaged_perceptron_tagger', download_dir=nltk_data_dir)
     logger.info("Downloaded NLTK data successfully")
@@ -235,7 +236,12 @@ class RecipeImageScannerService:
         recipe_data["steps"] = RecipeImageScannerService._parse_instructions(instruction_section)
 
         # Set description
-        recipe_data["description"] = " ".join(description_lines)
+        if description_lines:
+            recipe_data["description"] = " ".join(description_lines)
+        else:
+            # If no description was found, create a default one based on the title
+            if recipe_data["title"]:
+                recipe_data["description"] = f"Classic {recipe_data['title'].lower()} recipe."
 
         return recipe_data
 
@@ -387,9 +393,8 @@ class RecipeImageScannerService:
                 "notes": ""
             }
 
-            # Try to extract quantity and unit only if there's a clear pattern
-            # Look for patterns like "1 cup" or "2 tablespoons"
-            match = re.match(r'^(\d+(?:\s+\d+\/\d+)?|\d+\/\d+)\s+([a-zA-Z]+)\s+(.+)$', line.strip())
+            # Look for patterns like "1 cup", "2 tablespoons", or "2 1/4 cups"
+            match = re.match(r'^(\d+\s+\d+\/\d+|\d+(?:\s*[\./]\s*\d+)?)\s*([a-zA-Z]+)?\s+(.+)$', line.strip())
 
             if match:
                 quantity_str = match.group(1).strip()
@@ -402,12 +407,14 @@ class RecipeImageScannerService:
                         # Handle mixed fractions like "2 1/4"
                         if ' ' in quantity_str and '/' in quantity_str:
                             whole_part, fraction_part = quantity_str.split(' ', 1)
-                            num, denom = fraction_part.split('/')
-                            ingredient["quantity"] = float(whole_part) + (float(num) / float(denom))
+                            fraction_parts = fraction_part.split('/')
+                            if len(fraction_parts) == 2:
+                                ingredient["quantity"] = float(whole_part) + (float(fraction_parts[0]) / float(fraction_parts[1]))
                         # Handle simple fractions like "1/2"
                         elif '/' in quantity_str:
-                            num, denom = quantity_str.split('/')
-                            ingredient["quantity"] = float(num) / float(denom)
+                            parts = quantity_str.replace(' ', '').split('/')
+                            if len(parts) == 2:
+                                ingredient["quantity"] = float(parts[0]) / float(parts[1])
                         else:
                             ingredient["quantity"] = float(quantity_str)
 
@@ -429,16 +436,14 @@ class RecipeImageScannerService:
                 # Remove notes from name
                 ingredient["name"] = re.sub(r'\([^)]+\)', '', ingredient["name"]).strip()
 
-            # Look for preparation instructions after commas
-            if ',' in ingredient["name"]:
-                parts = ingredient["name"].split(',', 1)
-                ingredient["name"] = parts[0].strip()
-                if len(parts) > 1 and parts[1].strip():
-                    # Add the part after comma as notes
-                    if ingredient["notes"]:
-                        ingredient["notes"] += "; " + parts[1].strip()
-                    else:
-                        ingredient["notes"] = parts[1].strip()
+            # Extract notes after comma
+            comma_match = re.search(r',\s*(.+)$', ingredient["name"])
+            if comma_match:
+                # Only use comma notes if we don't already have notes
+                if not ingredient["notes"]:
+                    ingredient["notes"] = comma_match.group(1).strip()
+                # Remove notes from name
+                ingredient["name"] = re.sub(r',\s*.+$', '', ingredient["name"]).strip()
 
             # Clean up the name
             ingredient["name"] = ingredient["name"].strip(',.:;')
