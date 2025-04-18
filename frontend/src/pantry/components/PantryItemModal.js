@@ -11,17 +11,24 @@ import {
   Label,
   Row,
   Col,
-  Alert
+  Alert,
+  FormText
 } from "reactstrap";
+import axios from "axios";
 import IngredientSelect from "../../groceryList/components/IngredientSelect";
+import UnitSelect from "../../common/components/UnitSelect";
 import "../pages/List.css";
 
 const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
   const [activeItem, setActiveItem] = useState(initialItem);
   const [error, setError] = useState("");
+  const [showExactQuantity, setShowExactQuantity] = useState(false);
 
   useEffect(() => {
     setActiveItem(initialItem);
+    // If quantity and unit are set, show the exact quantity section
+    // Otherwise, default to false (track exact quantity off by default)
+    setShowExactQuantity(initialItem.quantity != null && initialItem.quantity !== "" ? true : false);
   }, [initialItem]);
 
   const handleChange = (e) => {
@@ -47,6 +54,36 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
     setActiveItem(updatedItem);
   };
 
+  // Handle unit change with automatic conversion
+  const handleUnitChange = async (newUnit) => {
+    // If no ingredient or quantity, just update the unit without conversion
+    if (!activeItem.ingredient || !activeItem.quantity || !activeItem.unit || newUnit === activeItem.unit) {
+      setActiveItem({ ...activeItem, unit: newUnit });
+      return;
+    }
+
+    try {
+      // Convert the quantity to the new unit
+      const response = await axios.post('/api/measurement/convert/', {
+        quantity: parseFloat(activeItem.quantity),
+        from_unit: activeItem.unit,
+        to_unit: newUnit,
+        ingredient_id: activeItem.ingredient
+      });
+
+      // Update the item with the converted quantity and new unit
+      setActiveItem({
+        ...activeItem,
+        quantity: response.data.converted_quantity,
+        unit: newUnit
+      });
+    } catch (err) {
+      console.error('Conversion error:', err);
+      // If conversion fails, just update the unit without changing the quantity
+      setActiveItem({ ...activeItem, unit: newUnit });
+    }
+  };
+
   const handleIngredientChange = (selectedIngredient) => {
     if (selectedIngredient) {
       setActiveItem({
@@ -69,12 +106,33 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
       setError("Please select an ingredient");
       return;
     }
-    onSave(activeItem);
+
+    // If exact quantity is not being shown, clear those fields
+    const itemToSave = { ...activeItem };
+    if (!showExactQuantity) {
+      itemToSave.quantity = null;
+      itemToSave.unit = null;
+    }
+
+    onSave(itemToSave);
   };
 
-  const commonUnits = [
-    "g", "kg", "oz", "lb", "ml", "l", "tsp", "tbsp", "cup", "pint", "quart", "gallon"
-  ];
+  // Stock level colors for visual indication
+  const stockLevelColors = {
+    high: 'success',
+    medium: 'warning',
+    low: 'danger',
+    out: 'dark'
+  };
+
+  // Stock level icons
+  const stockLevelIcons = {
+    high: 'bi bi-battery-full',
+    medium: 'bi bi-battery-half',
+    low: 'bi bi-battery-low',
+    out: 'bi bi-battery'
+  };
+
 
   return (
     <Modal isOpen={true} toggle={toggle} size="lg">
@@ -84,7 +142,7 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
       <ModalBody>
         {error && <Alert color="danger">{error}</Alert>}
         <Form>
-          <FormGroup className="mb-3">
+          <FormGroup className="mb-4">
             <Label for="item-ingredient" className="fw-bold">Ingredient *</Label>
             <IngredientSelect
               selectedIngredient={activeItem.ingredient_details ? {
@@ -94,39 +152,72 @@ const PantryItemModal = ({ activeItem: initialItem, toggle, onSave }) => {
               onChange={handleIngredientChange}
             />
           </FormGroup>
-          <Row>
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <Label for="item-quantity" className="fw-bold">Quantity</Label>
-                <Input
-                  type="number"
-                  id="item-quantity"
-                  name="quantity"
-                  value={activeItem.quantity || ""}
-                  onChange={handleChange}
-                  min="0.01"
-                  step={activeItem.unit ? "0.01" : "1"}
-                />
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup className="mb-3">
-                <Label for="item-unit" className="fw-bold">Unit</Label>
-                <Input
-                  type="select"
-                  id="item-unit"
-                  name="unit"
-                  value={activeItem.unit || ""}
-                  onChange={handleChange}
-                >
-                  <option value="">No Unit</option>
-                  {commonUnits.map(unit => (
-                    <option key={unit} value={unit}>{unit}</option>
-                  ))}
-                </Input>
-              </FormGroup>
-            </Col>
-          </Row>
+
+          <FormGroup className="mb-4">
+            <Label className="fw-bold">Stock Level</Label>
+            <div className="d-flex justify-content-between mb-2">
+              {['high', 'medium', 'low', 'out'].map(level => (
+                <div key={level} className="text-center" style={{ flex: '1' }}>
+                  <Button
+                    color={activeItem.stock_level === level ? stockLevelColors[level] : 'outline-secondary'}
+                    className="rounded-circle p-3 mb-2 d-flex align-items-center justify-content-center mx-auto"
+                    onClick={() => setActiveItem({ ...activeItem, stock_level: level })}
+                    style={{ width: '60px', height: '60px' }}
+                  >
+                    <i className={stockLevelIcons[level] + " fs-4"}></i>
+                  </Button>
+                  <div className="small text-capitalize">{level}</div>
+                </div>
+              ))}
+            </div>
+          </FormGroup>
+
+          <FormGroup className="mb-3">
+            <div className="form-check form-switch">
+              <Input
+                type="checkbox"
+                className="form-check-input"
+                id="exact-quantity-switch"
+                checked={showExactQuantity}
+                onChange={() => setShowExactQuantity(!showExactQuantity)}
+              />
+              <Label className="form-check-label" for="exact-quantity-switch">
+                Track exact quantity
+              </Label>
+            </div>
+            <FormText color="muted">
+              Enable this if you want to track the precise amount in your pantry.
+            </FormText>
+          </FormGroup>
+
+          {showExactQuantity && (
+            <>
+              <Row>
+                <Col md={6}>
+                  <FormGroup className="mb-3">
+                    <Label for="item-quantity" className="fw-bold">Quantity</Label>
+                    <Input
+                      type="number"
+                      id="item-quantity"
+                      name="quantity"
+                      value={activeItem.quantity || ""}
+                      onChange={handleChange}
+                      min="0.01"
+                      step={activeItem.unit ? "0.01" : "1"}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <UnitSelect
+                    value={activeItem.unit || ""}
+                    onChange={handleUnitChange}
+                    label="Unit"
+                  />
+                </Col>
+              </Row>
+
+            </>
+          )}
           <FormGroup className="mb-3">
             <Label for="item-notes" className="fw-bold">Notes</Label>
             <Input
