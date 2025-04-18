@@ -1,0 +1,82 @@
+[
+  {
+    "model": "grocery_list.category",
+    "pk": 1,
+    "fields": {
+      "name": "Produce",
+      "description": "Fresh fruits and vegetables"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 2,
+    "fields": {
+      "name": "Dairy",
+      "description": "Milk, cheese, yogurt, and other dairy products"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 3,
+    "fields": {
+      "name": "Meat",
+      "description": "Beef, chicken, pork, and other meats"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 4,
+    "fields": {
+      "name": "Bakery",
+      "description": "Bread, pastries, and other baked goods"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 5,
+    "fields": {
+      "name": "Canned Goods",
+      "description": "Canned vegetables, fruits, and other preserved foods"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 6,
+    "fields": {
+      "name": "Dry Goods",
+      "description": "Pasta, rice, beans, and other dry goods"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 7,
+    "fields": {
+      "name": "Frozen",
+      "description": "Frozen vegetables, fruits, and prepared foods"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 8,
+    "fields": {
+      "name": "Snacks",
+      "description": "Chips, crackers, and other snack foods"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 9,
+    "fields": {
+      "name": "Beverages",
+      "description": "Soda, juice, coffee, tea, and other drinks"
+    }
+  },
+  {
+    "model": "grocery_list.category",
+    "pk": 10,
+    "fields": {
+      "name": "Household",
+      "description": "Cleaning supplies, paper products, and other household items"
+    }
+  }
+]

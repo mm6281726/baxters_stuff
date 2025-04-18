@@ -1,10 +1,20 @@
-FROM python:3.9-slim
+FROM python:3.13-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_ROOT_USER_ACTION=ignore \
     NLTK_DATA=/app/nltk_data
+
+# Install system dependencies for OpenCV and Tesseract
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender-dev \
+    tesseract-ocr \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a working directory
 WORKDIR /app

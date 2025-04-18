@@ -1,38 +1,34 @@
-version: '3.8'
-
 services:
-  backend:
-    container_name: baxters_backend
+  baxters_stuff:
+    container_name: baxters_stuff
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    image: baxters_backend:latest
+    image: baxters_stuff:latest
     restart: unless-stopped
     volumes:
       - backend_data:/app/backend/instance
       - nltk_data:/app/nltk_data
+      - backups:/app/backups
     environment:
       - DEBUG=False
       - SECRET_KEY=${SECRET_KEY:-default_secret_key_change_in_production}
-      - ALLOWED_HOSTS=localhost,127.0.0.1,backend,frontend
-      - CORS_ORIGIN_WHITELIST=http://localhost,http://frontend
-      - CSRF_TRUSTED_ORIGINS=http://localhost,http://frontend
+      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - CORS_ORIGIN_WHITELIST=http://localhost
+      - CSRF_TRUSTED_ORIGINS=http://localhost
       - FRONTEND_URL=http://localhost
+      # Initial data
+      - LOAD_INITIAL_DATA=true
     ports:
-      - "9090:9090"
-
-  frontend:
-    container_name: baxters_frontend
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    image: baxters_frontend:latest
-    restart: unless-stopped
-    depends_on:
-      - backend
-    ports:
-      - "3000:80"
+      - "8080:80"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   backend_data:
   nltk_data:
+  backups:
